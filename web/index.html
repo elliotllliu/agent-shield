@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentShield — AI Agent Security Scanner</title>
+  <meta name="description" content="Scan AI agent skills, MCP servers, and plugins for security vulnerabilities. Free online scanner.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 3rem; }
+    .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .header h1 span { color: #58a6ff; }
+    .header p { color: #8b949e; font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .header .stat { color: #f0883e; font-weight: 600; }
+
+    /* Input */
+    .scan-form {
+      display: flex; gap: 0.5rem;
+      background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+      padding: 0.5rem; margin-bottom: 2rem;
+    }
+    .scan-form input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: #e6edf3; font-size: 1rem; padding: 0.75rem;
+    }
+    .scan-form input::placeholder { color: #484f58; }
+    .scan-form button {
+      background: #238636; color: white; border: none; border-radius: 6px;
+      padding: 0.75rem 1.5rem; font-size: 1rem; cursor: pointer; font-weight: 600;
+      transition: background 0.2s;
+    }
+    .scan-form button:hover { background: #2ea043; }
+    .scan-form button:disabled { background: #30363d; cursor: not-allowed; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 3rem; display: none; }
+    .loading .spinner {
+      width: 40px; height: 40px; border: 3px solid #30363d;
+      border-top-color: #58a6ff; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Results */
+    .results { display: none; }
+    .score-card {
+      text-align: center; padding: 2rem;
+      background: #161b22; border: 1px solid #30363d; border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .score-number { font-size: 4rem; font-weight: 700; line-height: 1; }
+    .score-label { font-size: 1.2rem; margin-top: 0.5rem; }
+    .score-meta { color: #8b949e; margin-top: 0.5rem; font-size: 0.9rem; }
+
+    .score-critical { color: #f85149; }
+    .score-high { color: #f0883e; }
+    .score-moderate { color: #d29922; }
+    .score-low { color: #3fb950; }
+
+    /* Findings */
+    .findings-section { margin-bottom: 1.5rem; }
+    .findings-header {
+      font-size: 1rem; font-weight: 600; padding: 0.75rem 0;
+      border-bottom: 1px solid #21262d; margin-bottom: 0.5rem;
+    }
+    .finding {
+      padding: 0.75rem 1rem; border-left: 3px solid; margin-bottom: 0.25rem;
+      background: #161b22; border-radius: 0 6px 6px 0; font-size: 0.9rem;
+    }
+    .finding-critical { border-left-color: #f85149; }
+    .finding-warning { border-left-color: #d29922; }
+    .finding-info { border-left-color: #58a6ff; }
+    .finding .file { color: #58a6ff; }
+    .finding .rule { color: #8b949e; }
+    .finding .msg { color: #e6edf3; }
+    .finding .fp-tag {
+      display: inline-block; background: #30363d; color: #8b949e;
+      padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.75rem;
+      margin-left: 0.5rem;
+    }
+    .finding .fp-reason { color: #8b949e; font-size: 0.8rem; margin-top: 0.25rem; }
+
+    /* Badge section */
+    .badge-section {
+      background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+      padding: 1.5rem; margin-top: 1.5rem;
+    }
+    .badge-section h3 { margin-bottom: 1rem; }
+    .badge-code {
+      background: #0d1117; border: 1px solid #30363d; border-radius: 6px;
+      padding: 1rem; font-family: monospace; font-size: 0.85rem;
+      word-break: break-all; cursor: pointer; position: relative;
+    }
+    .badge-code:hover { border-color: #58a6ff; }
+    .badge-code .copy-hint {
+      position: absolute; top: 0.5rem; right: 0.5rem;
+      color: #8b949e; font-size: 0.75rem;
+    }
+
+    /* Error */
+    .error {
+      background: #2d1117; border: 1px solid #f85149; border-radius: 8px;
+      padding: 1rem; color: #f85149; display: none;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center; margin-top: 3rem; padding-top: 2rem;
+      border-top: 1px solid #21262d; color: #8b949e; font-size: 0.85rem;
+    }
+    .footer a { color: #58a6ff; text-decoration: none; }
+
+    /* Examples */
+    .examples { text-align: center; margin-bottom: 2rem; }
+    .examples span { color: #8b949e; font-size: 0.9rem; }
+    .examples a {
+      color: #58a6ff; text-decoration: none; margin: 0 0.5rem;
+      font-size: 0.9rem;
+    }
+    .examples a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🛡️ <span>AgentShield</span></h1>
+      <p>Security scanner for AI agent skills, MCP servers & plugins</p>
+      <p class="stat">16 rules • 50ms scans • Zero config</p>
+    </div>
+
+    <form class="scan-form" onsubmit="doScan(event)">
+      <input type="text" id="url-input" placeholder="github.com/owner/repo or github.com/owner/repo/tree/main/skills/xxx" autocomplete="off">
+      <button type="submit" id="scan-btn">Scan</button>
+    </form>
+
+    <div class="examples">
+      <span>Try:</span>
+      <a href="#" onclick="tryExample('https://github.com/vercel-labs/agent-skills')">vercel-labs/agent-skills</a>
+      <a href="#" onclick="tryExample('https://github.com/anthropics/skills')">anthropics/skills</a>
+      <a href="#" onclick="tryExample('https://github.com/google-labs-code/stitch-skills')">google-labs-code/stitch-skills</a>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Cloning and scanning repository...</p>
+      <p style="color: #8b949e; font-size: 0.85rem; margin-top: 0.5rem;">This may take 10-30 seconds</p>
+    </div>
+
+    <div class="error" id="error"></div>
+
+    <div class="results" id="results">
+      <div class="score-card">
+        <div class="score-number" id="score">—</div>
+        <div class="score-label" id="risk-label">—</div>
+        <div class="score-meta" id="scan-meta">—</div>
+      </div>
+
+      <div id="findings-list"></div>
+
+      <div class="badge-section">
+        <h3>📋 Add badge to your README</h3>
+        <div class="badge-code" id="badge-code" onclick="copyBadge()">
+          <span class="copy-hint">Click to copy</span>
+          <span id="badge-text"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>
+        <a href="https://github.com/elliotllliu/agentshield">GitHub</a> •
+        <a href="https://www.npmjs.com/package/@elliotllliu/agentshield">npm</a> •
+        <a href="https://github.com/elliotllliu/agentshield/blob/main/docs/clawhub-security-report.md">Security Report</a>
+      </p>
+      <p style="margin-top: 0.5rem;">
+        CLI: <code style="background:#161b22;padding:0.2rem 0.4rem;border-radius:4px;">npx @elliotllliu/agentshield scan ./skill/</code>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Check if URL has /scan/:owner/:repo
+    const pathMatch = window.location.pathname.match(/^\/scan\/([^/]+\/[^/]+)/);
+    if (pathMatch) {
+      document.getElementById('url-input').value = `https://github.com/${pathMatch[1]}`;
+      window.addEventListener('load', () => doScan());
+    }
+
+    function tryExample(url) {
+      document.getElementById('url-input').value = url;
+      doScan();
+    }
+
+    async function doScan(e) {
+      if (e) e.preventDefault();
+
+      const input = document.getElementById('url-input');
+      const url = input.value.trim();
+      if (!url) return;
+
+      // Parse subpath from tree URLs
+      let repoUrl = url;
+      let subpath = '';
+      const treeMatch = url.match(/github\.com\/([^/]+\/[^/]+)\/tree\/[^/]+\/(.+)/);
+      if (treeMatch) {
+        repoUrl = `https://github.com/${treeMatch[1]}`;
+        subpath = treeMatch[2];
+      }
+
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('error').style.display = 'none';
+      document.getElementById('scan-btn').disabled = true;
+
+      try {
+        const res = await fetch('/api/scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: repoUrl, path: subpath }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Scan failed');
+        }
+
+        renderResults(data, url);
+      } catch (err) {
+        document.getElementById('error').textContent = `❌ ${err.message}`;
+        document.getElementById('error').style.display = 'block';
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('scan-btn').disabled = false;
+      }
+    }
+
+    function renderResults(data, url) {
+      const { score, filesScanned, linesScanned, findings, duration } = data;
+
+      // Score
+      const scoreEl = document.getElementById('score');
+      scoreEl.textContent = `${score}/100`;
+      scoreEl.className = 'score-number ' + (
+        score >= 90 ? 'score-low' : score >= 70 ? 'score-moderate' :
+        score >= 40 ? 'score-high' : 'score-critical'
+      );
+
+      // Risk label
+      const riskEl = document.getElementById('risk-label');
+      riskEl.textContent = score >= 90 ? '✅ Low Risk' : score >= 70 ? '🟡 Moderate Risk' :
+        score >= 40 ? '🟠 High Risk' : '🔴 Critical Risk';
+
+      // Meta
+      document.getElementById('scan-meta').textContent =
+        `${filesScanned} files • ${linesScanned.toLocaleString()} lines • ${duration}ms`;
+
+      // Findings
+      const list = document.getElementById('findings-list');
+      list.innerHTML = '';
+
+      for (const severity of ['critical', 'warning', 'info']) {
+        const group = findings.filter(f => f.severity === severity);
+        if (group.length === 0) continue;
+
+        const icons = { critical: '🔴 CRITICAL', warning: '🟡 WARNING', info: '🟢 INFO' };
+        const section = document.createElement('div');
+        section.className = 'findings-section';
+        section.innerHTML = `<div class="findings-header">${icons[severity]} (${group.length})</div>`;
+
+        for (const f of group) {
+          const div = document.createElement('div');
+          div.className = `finding finding-${severity}`;
+          const loc = f.line ? `${f.file}:${f.line}` : f.file;
+          const fpTag = f.possibleFalsePositive ? `<span class="fp-tag">likely false positive</span>` : '';
+          const fpReason = f.falsePositiveReason ? `<div class="fp-reason">ℹ️ ${f.falsePositiveReason}</div>` : '';
+          div.innerHTML = `<span class="file">${loc}</span> <span class="rule">[${f.rule}]</span> <span class="msg">${f.message}</span>${fpTag}${fpReason}`;
+          section.appendChild(div);
+        }
+
+        list.appendChild(section);
+      }
+
+      // Badge
+      const ghMatch = url.match(/github\.com\/([^/]+\/[^/]+)/);
+      if (ghMatch) {
+        const color = score >= 90 ? '4c1' : score >= 70 ? 'dfb317' : score >= 40 ? 'fe7d37' : 'e05d44';
+        const badge = `[![AgentShield ${score}/100](https://img.shields.io/badge/AgentShield-${score}%2F100-${color})](https://github.com/elliotllliu/agentshield)`;
+        document.getElementById('badge-text').textContent = badge;
+      }
+
+      document.getElementById('results').style.display = 'block';
+    }
+
+    function copyBadge() {
+      const text = document.getElementById('badge-text').textContent;
+      navigator.clipboard.writeText(text);
+      const hint = document.querySelector('.copy-hint');
+      hint.textContent = '✅ Copied!';
+      setTimeout(() => { hint.textContent = 'Click to copy'; }, 2000);
+    }
+  </script>
+</body>
+</html>

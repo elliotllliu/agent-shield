@@ -8,6 +8,11 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.21.0"
-  }
+    "express": "^4.22.1"
+  },
+  "description": "",
+  "main": "server.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
