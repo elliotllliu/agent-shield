@@ -1,6 +1,6 @@
 import { readFileSync, statSync, readdirSync } from "fs";
-import { join, relative, extname } from "path";
-import type { ScannedFile } from "../types.js";
+import { join, relative, extname, basename, dirname } from "path";
+import type { ScannedFile, FileContext } from "../types.js";
 
 const SKIP_DIRS = new Set([
   "node_modules", ".git", "dist", "build", "__pycache__", ".venv", "venv",
@@ -48,12 +48,14 @@ export function collectFiles(dir: string, base?: string): ScannedFile[] {
 
       try {
         const content = readFileSync(fullPath, "utf-8");
+        const relPath = relative(root, fullPath);
         files.push({
           path: fullPath,
-          relativePath: relative(root, fullPath),
+          relativePath: relPath,
           content,
           lines: content.split("\n"),
           ext,
+          context: detectFileContext(relPath, name),
         });
       } catch {
         // skip unreadable files
@@ -67,4 +69,53 @@ export function collectFiles(dir: string, base?: string): ScannedFile[] {
 /** Count total lines across files */
 export function totalLines(files: ScannedFile[]): number {
   return files.reduce((sum, f) => sum + f.lines.length, 0);
+}
+
+/** Detect file context for false positive reduction */
+function detectFileContext(relativePath: string, fileName: string): FileContext {
+  const lowerPath = relativePath.toLowerCase();
+  const lowerName = fileName.toLowerCase();
+  const dirName = dirname(lowerPath).toLowerCase();
+
+  // Test files
+  if (
+    lowerName.includes(".test.") || lowerName.includes(".spec.") ||
+    lowerName.includes("_test.") || lowerName.includes("_spec.") ||
+    lowerPath.includes("__tests__") || lowerPath.includes("/tests/") ||
+    lowerPath.startsWith("tests/") || lowerPath.startsWith("test/") ||
+    lowerName === "jest.config.js" || lowerName === "vitest.config.ts"
+  ) {
+    return "test";
+  }
+
+  // Deploy / CI scripts
+  if (
+    lowerPath.includes("deploy") || lowerPath.includes("ci/") ||
+    lowerPath.includes(".github/") || lowerPath.includes("scripts/") ||
+    lowerPath.includes("infra/") || lowerPath.includes("ops/") ||
+    lowerName.includes("deploy") || lowerName.includes("release") ||
+    lowerName === "dockerfile" || lowerName === "makefile"
+  ) {
+    return "deploy";
+  }
+
+  // Config files
+  if (
+    [".json", ".yaml", ".yml", ".toml"].includes(extname(lowerName)) &&
+    !lowerName.includes("skill")
+  ) {
+    return "config";
+  }
+
+  // Documentation
+  if (extname(lowerName) === ".md") {
+    return "docs";
+  }
+
+  // Shell scripts (standalone)
+  if ([".sh", ".bash", ".zsh"].includes(extname(lowerName))) {
+    return "script";
+  }
+
+  return "source";
 }

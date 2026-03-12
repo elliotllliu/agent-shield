@@ -4,6 +4,18 @@ import { computeScore } from "../score.js";
 import { loadConfig, loadIgnorePatterns, isIgnored } from "../config.js";
 import type { ScanResult, Finding, ScanConfig } from "../types.js";
 
+/** Context types where findings are likely false positives */
+const FP_CONTEXTS: Record<string, string> = {
+  test: "Test file — assertions and mocks commonly trigger security patterns",
+  deploy: "Deploy/CI script — HTTP requests and credential access are expected",
+};
+
+/** Rules most likely to false-positive in specific contexts */
+const CONTEXT_FP_RULES: Record<string, Set<string>> = {
+  test: new Set(["data-exfil", "env-leak", "backdoor", "network-ssrf", "sensitive-read", "phone-home"]),
+  deploy: new Set(["data-exfil", "env-leak", "backdoor", "network-ssrf", "credential-hardcode"]),
+};
+
 /** Run all rules against a target directory */
 export function scan(targetDir: string, configOverride?: Partial<ScanConfig>): ScanResult {
   const start = Date.now();
@@ -39,7 +51,28 @@ export function scan(targetDir: string, configOverride?: Partial<ScanConfig>): S
     findings.push(...rule.run(files));
   }
 
-  // Apply severity overrides
+  // Apply false positive detection based on file context
+  for (const finding of findings) {
+    // Find the file this finding is about
+    const file = files.find(
+      (f) => f.relativePath === finding.file || f.path === finding.file
+    );
+    if (file && FP_CONTEXTS[file.context]) {
+      const fpRules = CONTEXT_FP_RULES[file.context];
+      if (fpRules?.has(finding.rule)) {
+        finding.possibleFalsePositive = true;
+        finding.falsePositiveReason = FP_CONTEXTS[file.context]!;
+        // Downgrade severity: critical → warning, warning → info
+        if (finding.severity === "critical") {
+          finding.severity = "warning";
+        } else if (finding.severity === "warning") {
+          finding.severity = "info";
+        }
+      }
+    }
+  }
+
+  // Apply severity overrides from config (after FP detection, so user can override)
   if (config.severity) {
     for (const finding of findings) {
       if (config.severity[finding.rule]) {

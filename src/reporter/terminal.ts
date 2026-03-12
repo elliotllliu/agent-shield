@@ -38,6 +38,10 @@ export function printReport(result: ScanResult): void {
       const loc = f.line ? `${f.file}:${f.line}` : f.file;
       const colorize = SEVERITY_LINE[f.severity] || chalk.white;
       console.log(colorize(`${prefix} ${loc} — [${f.rule}] ${f.message}`));
+      if (f.possibleFalsePositive) {
+        const fpPrefix = i < group.length - 1 ? "  │  " : "     ";
+        console.log(chalk.dim(`${fpPrefix}⚠️  Likely false positive: ${f.falsePositiveReason}`));
+      }
       if (f.evidence) {
         const ePrefix = i < group.length - 1 ? "  │  " : "     ";
         console.log(chalk.dim(`${ePrefix}${f.evidence}`));
