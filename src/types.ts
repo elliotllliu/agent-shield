@@ -45,3 +45,14 @@ export interface SkillMetadata {
   permissions?: string[];
   [key: string]: unknown;
 }
+
+/** Scan configuration from .agentshield.yml */
+export interface ScanConfig {
+  rules?: {
+    enable?: string[];
+    disable?: string[];
+  };
+  severity?: Record<string, "critical" | "warning" | "info">;
+  failUnder?: number;
+  ignore?: string[];
+}
