@@ -1,0 +1,33 @@
+{
+  "name": "agentshield",
+  "version": "0.1.0",
+  "description": "Security scanner for AI agent skills, MCP servers, and plugins",
+  "type": "module",
+  "bin": {
+    "agentshield": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "test": "node --import tsx --test tests/**/*.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["security", "ai-agent", "skill", "mcp", "scanner", "audit", "openclaw"],
+  "author": "Elliot Liu",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "glob": "^11.0.1",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": ["dist", "README.md", "LICENSE"]
+}
