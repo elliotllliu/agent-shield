@@ -14,8 +14,6 @@
 npx @elliotllliu/agent-shield scan ./my-skill/
 ```
 
-⚠️ **Status**: Early stage (Pre-alpha). Core scanning works, but has not been independently audited. Good for quick self-checks, should not be your only security assessment.
-
 ---
 
 ## 🏆 Key Features
