@@ -1,7 +1,7 @@
 # AgentShield Benchmark Results
 
-Generated: 2026-03-13T06:12:38.958Z
-Duration: 454ms
+Generated: 2026-03-13T06:22:25.166Z
+Duration: 322ms
 
 ## Summary
 
@@ -61,27 +61,27 @@ Duration: 454ms
 
 | File | Clean | Critical | Warning | Score |
 |------|-------|----------|---------|-------|
-| benign/01-weather-tool.md | ✅ | 0 | 0 | 86 |
-| benign/02-code-formatter.md | ✅ | 0 | 0 | 86 |
-| benign/03-git-helper.md | ✅ | 0 | 0 | 86 |
-| benign/04-database-query.md | ✅ | 0 | 0 | 86 |
-| benign/05-translation.md | ✅ | 0 | 0 | 86 |
-| benign/06-image-resizer.md | ✅ | 0 | 0 | 86 |
-| benign/07-markdown-preview.md | ✅ | 0 | 0 | 86 |
-| benign/08-calculator.md | ✅ | 0 | 0 | 86 |
-| benign/09-spell-checker.md | ✅ | 0 | 0 | 86 |
-| benign/10-file-search.md | ✅ | 0 | 0 | 86 |
-| benign/11-json-validator.md | ✅ | 0 | 0 | 86 |
-| benign/11-security-tutorial.md | ✅ | 0 | 0 | 86 |
-| benign/12-deployment-script.sh | ✅ | 0 | 0 | 86 |
-| benign/12-test-generator.md | ✅ | 0 | 0 | 86 |
-| benign/13-docker-helper.md | ✅ | 0 | 0 | 86 |
-| benign/13-env-config-example.md | ✅ | 0 | 0 | 86 |
-| benign/14-changelog.md | ✅ | 0 | 0 | 86 |
-| benign/15-api-client.md | ✅ | 0 | 0 | 86 |
-| benign/16-log-analyzer.py | ✅ | 0 | 0 | 86 |
-| benign/17-mcp-tool-legit.json | ✅ | 0 | 0 | 86 |
-| benign/18-cron-healthcheck.py | ✅ | 0 | 1 | 86 |
-| benign/19-base64-codec.py | ✅ | 0 | 0 | 86 |
-| benign/20-subprocess-tool.py | ✅ | 0 | 0 | 86 |
-| benign/21-multilang-readme.md | ✅ | 0 | 0 | 86 |
+| benign/01-weather-tool.md | ✅ | 0 | 0 | 70 |
+| benign/02-code-formatter.md | ✅ | 0 | 0 | 70 |
+| benign/03-git-helper.md | ✅ | 0 | 0 | 70 |
+| benign/04-database-query.md | ✅ | 0 | 0 | 70 |
+| benign/05-translation.md | ✅ | 0 | 0 | 70 |
+| benign/06-image-resizer.md | ✅ | 0 | 0 | 70 |
+| benign/07-markdown-preview.md | ✅ | 0 | 0 | 70 |
+| benign/08-calculator.md | ✅ | 0 | 0 | 70 |
+| benign/09-spell-checker.md | ✅ | 0 | 0 | 70 |
+| benign/10-file-search.md | ✅ | 0 | 0 | 70 |
+| benign/11-json-validator.md | ✅ | 0 | 0 | 70 |
+| benign/11-security-tutorial.md | ✅ | 0 | 0 | 70 |
+| benign/12-deployment-script.sh | ✅ | 0 | 0 | 70 |
+| benign/12-test-generator.md | ✅ | 0 | 0 | 70 |
+| benign/13-docker-helper.md | ✅ | 0 | 0 | 70 |
+| benign/13-env-config-example.md | ✅ | 0 | 0 | 70 |
+| benign/14-changelog.md | ✅ | 0 | 0 | 70 |
+| benign/15-api-client.md | ✅ | 0 | 0 | 70 |
+| benign/16-log-analyzer.py | ✅ | 0 | 0 | 70 |
+| benign/17-mcp-tool-legit.json | ✅ | 0 | 2 | 70 |
+| benign/18-cron-healthcheck.py | ✅ | 0 | 1 | 70 |
+| benign/19-base64-codec.py | ✅ | 0 | 0 | 70 |
+| benign/20-subprocess-tool.py | ✅ | 0 | 0 | 70 |
+| benign/21-multilang-readme.md | ✅ | 0 | 0 | 70 |
