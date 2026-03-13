@@ -1,0 +1,13 @@
+description: >
+  File manager tool for reading and writing files in the workspace.
+  Supports text and binary formats. Use with caution for large files.
+
+name: file-manager
+parameters:
+  - name: path
+    type: string
+    description: "Path to the file"
+  - name: action
+    type: string
+    enum: [read, write, delete]
+    description: "Action to perform on the file"

@@ -1,17 +1,17 @@
 # AgentShield Benchmark Results
 
-Generated: 2026-03-13T06:03:16.634Z
-Duration: 256ms
+Generated: 2026-03-13T06:12:38.958Z
+Duration: 454ms
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
-| Malicious samples | 30 |
-| Benign samples | 23 |
-| True Positives | 30/30 |
+| Malicious samples | 33 |
+| Benign samples | 24 |
+| True Positives | 33/33 |
 | False Negatives | 0 |
-| True Negatives | 23/23 |
+| True Negatives | 24/24 |
 | False Positives | 0 |
 | **Recall** | **100.0%** |
 | **Precision** | **100.0%** |
@@ -24,23 +24,23 @@ Duration: 256ms
 | File | Detected | Critical | Warning | Score | Rules |
 |------|----------|----------|---------|-------|-------|
 | malicious/01-instruction-override.md | ✅ | 0 | 0 | 0 | prompt-injection |
-| malicious/02-identity-manipulation.md | ✅ | 0 | 0 | 0 | prompt-injection |
+| malicious/02-identity-manipulation.md | ✅ | 0 | 1 | 0 | multilang-injection, prompt-injection |
 | malicious/03-system-prompt-attacks.md | ✅ | 0 | 0 | 0 | prompt-injection |
 | malicious/04-hidden-instructions.md | ✅ | 0 | 0 | 0 | sensitive-read, prompt-injection |
-| malicious/05-behavioral-hijacking.md | ✅ | 0 | 1 | 0 | tool-shadowing, prompt-injection |
+| malicious/05-behavioral-hijacking.md | ✅ | 0 | 2 | 0 | tool-shadowing, multilang-injection, prompt-injection |
 | malicious/06-tool-poisoning.md | ✅ | 0 | 0 | 0 | prompt-injection |
 | malicious/07-data-exfiltration.md | ✅ | 0 | 0 | 0 | sensitive-read, prompt-injection |
 | malicious/08-encoding-evasion.md | ✅ | 0 | 0 | 0 | prompt-injection |
 | malicious/09-advanced-attacks.md | ✅ | 0 | 0 | 0 | sensitive-read, prompt-injection |
 | malicious/10-backdoor-eval.py | ✅ | 3 | 4 | 0 | backdoor, python-security |
-| malicious/10-mcp-config-attacks.md | ✅ | 0 | 2 | 0 | tool-shadowing, sensitive-read, prompt-injection |
+| malicious/10-mcp-config-attacks.md | ✅ | 0 | 3 | 0 | tool-shadowing, multilang-injection, sensitive-read, prompt-injection |
 | malicious/11-credential-leak.py | ✅ | 0 | 3 | 0 | credential-hardcode, sensitive-read |
 | malicious/11-subtle-injection.md | ✅ | 0 | 0 | 0 | prompt-injection |
 | malicious/12-crypto-miner.py | ✅ | 0 | 4 | 0 | crypto-mining |
 | malicious/12-suspicious-urls.md | ✅ | 0 | 0 | 0 | prompt-injection |
-| malicious/13-data-exfil.py | ✅ | 3 | 1 | 0 | data-exfil, attack-chain, env-leak, sensitive-read, skill-risks |
+| malicious/13-data-exfil.py | ✅ | 4 | 1 | 0 | data-exfil, cross-file, attack-chain, env-leak, sensitive-read, skill-risks |
 | malicious/13-skill-risks.md | ✅ | 0 | 0 | 0 | skill-risks |
-| malicious/14-env-exfil.py | ✅ | 0 | 0 | 0 | sensitive-read |
+| malicious/14-env-exfil.py | ✅ | 1 | 0 | 0 | cross-file, sensitive-read |
 | malicious/14-multilang-injection.md | ✅ | 0 | 0 | 0 | prompt-injection |
 | malicious/15-reverse-shell.sh | ✅ | 0 | 2 | 0 | reverse-shell |
 | malicious/15-toxic-flow-config.json | ✅ | 0 | 2 | 0 |  |
@@ -53,6 +53,9 @@ Duration: 256ms
 | malicious/22-skill-risks.md | ✅ | 0 | 0 | 0 | skill-risks |
 | malicious/23-sensitive-read.py | ✅ | 0 | 0 | 0 | sensitive-read, skill-risks |
 | malicious/24-privilege-escalation.sh | ✅ | 1 | 0 | 0 | backdoor, sensitive-read, skill-risks |
+| malicious/31-multilang-injection.md | ✅ | 0 | 4 | 0 | multilang-injection, prompt-injection |
+| malicious/33-memory-poisoning.md | ✅ | 0 | 3 | 0 | multilang-injection, prompt-injection |
+| malicious/35-full-kill-chain.py | ✅ | 6 | 2 | 0 | data-exfil, cross-file, attack-chain, env-leak, sensitive-read |
 
 ## Benign Samples
 
@@ -81,3 +84,4 @@ Duration: 256ms
 | benign/18-cron-healthcheck.py | ✅ | 0 | 1 | 86 |
 | benign/19-base64-codec.py | ✅ | 0 | 0 | 86 |
 | benign/20-subprocess-tool.py | ✅ | 0 | 0 | 86 |
+| benign/21-multilang-readme.md | ✅ | 0 | 0 | 86 |

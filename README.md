@@ -9,37 +9,40 @@ Catch data exfiltration, backdoors, privilege escalation, credential leaks, and 
 
 **Offline-first. Open source. Your data never leaves your machine.**
 
-> 💡 **vs Snyk Agent Scan:** AgentShield runs 100% locally with no API keys required. Add `--ai` for LLM-powered deep analysis using your own API key — no vendor lock-in, no rate limits.
+> 💡 **vs Snyk Agent Scan:** AgentShield runs 100% locally with no API keys required. Add `--ai` for LLM-powered deep analysis using your own API key - no vendor lock-in, no rate limits.
 
 ## Why AgentShield?
 
 AI agents install and execute third-party skills, MCP servers, and plugins with minimal security review. A single malicious skill can:
 
-- 🔑 **Steal credentials** — SSH keys, AWS secrets, API tokens
-- 📤 **Exfiltrate data** — read sensitive files and send them to external servers
-- 💀 **Open backdoors** — `eval()`, reverse shells, dynamic code execution
-- ⛏️ **Mine crypto** — hijack compute for cryptocurrency mining
-- 🕵️ **Bypass permissions** — claim "read-only" but execute shell commands
+- 🔑 **Steal credentials** - SSH keys, AWS secrets, API tokens
+- 📤 **Exfiltrate data** - read sensitive files and send them to external servers
+- 💀 **Open backdoors** - `eval()`, reverse shells, dynamic code execution
+- ⛏️ **Mine crypto** - hijack compute for cryptocurrency mining
+- 🕵️ **Bypass permissions** - claim "read-only" but execute shell commands
 
-AgentShield catches these patterns with **20 security rules** in under 50ms. Add `--ai` for LLM-powered deep analysis.
+AgentShield catches these patterns with **22 security rules** in under 50ms. Add `--ai` for LLM-powered deep analysis.
 
 ## Quick Start
 
 ```bash
-# Static analysis (20 rules, offline, ~50ms)
+# Static analysis (22 rules, offline, ~50ms)
 npx @elliotllliu/agentshield scan ./my-skill/
 
 # AI-powered deep analysis
 npx @elliotllliu/agentshield scan ./skill/ --ai --provider openai --model gpt-4o
 npx @elliotllliu/agentshield scan ./skill/ --ai --provider ollama --model llama3
 
+# Scan Python plugins (including .difypkg archives)
+npx @elliotllliu/agentshield scan ./plugin.difypkg
+
 # Discover installed agents on your machine
 npx @elliotllliu/agentshield discover
 ```
 
-## What It Detects — 18 Security Rules
+## What It Detects - 22 Security Rules
 
-### 🔴 Critical (auto-fail)
+### 🔴 High Risk (must fix)
 
 | Rule | Detects |
 |------|---------|
@@ -48,28 +51,34 @@ npx @elliotllliu/agentshield discover
 | `reverse-shell` | Outbound socket connections piped to `/bin/sh` |
 | `crypto-mining` | Mining pool connections, xmrig, coinhive patterns |
 | `credential-hardcode` | Hardcoded AWS keys (`AKIA...`), GitHub PATs (`ghp_...`), Stripe keys |
-| `env-leak` | `process.env` secrets + outbound HTTP (environment variable theft) |
 | `obfuscation` | `eval(atob(...))`, hex strings, `String.fromCharCode` obfuscation |
-| `typosquatting` | Suspicious npm names: `1odash` → `lodash`, `axois` → `axios` |
-| `hidden-files` | `.env` files with `PASSWORD`, `SECRET`, `API_KEY` committed to repo |
-| `prompt-injection` | Hidden instructions, identity manipulation, behavioral hijacking, TPA, multi-lang |
-| `tool-shadowing` | Cross-server tool name conflicts, tool override attacks |
 
-### 🟡 Warning (review recommended)
+### 🟡 Medium Risk (should check)
 
 | Rule | Detects |
 |------|---------|
+| `prompt-injection` | Hidden instructions, identity manipulation, behavioral hijacking, TPA, multi-lang |
+| `tool-shadowing` | Cross-server tool name conflicts, tool override attacks |
+| `env-leak` | `process.env` secrets + outbound HTTP (environment variable theft) |
 | `network-ssrf` | User-controlled URLs in fetch, AWS metadata endpoint access |
+| `phone-home` | `setInterval` + HTTP requests (beacon/C2 heartbeat pattern) |
+| `toxic-flow` | Cross-tool data leak flows (TF001) and destructive flows (TF002) |
+| `skill-risks` | Financial ops, untrusted content, external deps, credential handling |
+| `python-security` | Python-specific: eval, pickle, subprocess, SQL injection, SSTI |
+
+### 🟢 Low Risk (note)
+
+| Rule | Detects |
+|------|---------|
 | `privilege` | SKILL.md permissions vs actual code behavior mismatch |
 | `supply-chain` | Known CVEs in npm dependencies (`npm audit`) |
 | `sensitive-read` | Access to `~/.ssh/id_rsa`, `~/.aws/credentials`, `~/.kube/config` |
 | `excessive-perms` | Too many or dangerous permissions in SKILL.md |
-| `phone-home` | `setInterval` + HTTP requests (beacon/C2 heartbeat pattern) |
-| `mcp-manifest` | MCP server: wildcard perms, undeclared capabilities, suspicious tool descriptions |
-| `skill-risks` | Financial ops, untrusted content, external deps, system modification, credential handling |
-| `toxic-flow` | Cross-tool data leak flows (TF001) and destructive flows (TF002) |
+| `mcp-manifest` | MCP server: wildcard perms, undeclared capabilities, suspicious tools |
+| `typosquatting` | Suspicious npm names: `1odash` → `lodash`, `axois` → `axios` |
+| `hidden-files` | `.env` files with `PASSWORD`, `SECRET`, `API_KEY` committed to repo |
 
-### 🎯 Prompt Injection Detection — 55+ Patterns
+### 🎯 Prompt Injection Detection - 55+ Patterns
 
 Based on research from [Invariant Labs TPA](https://invariantlabs.ai/blog/mcp-security-notification-tool-poisoning-attacks), [BIPIA (KDD 2025)](https://arxiv.org/abs/2312.14197), and [Snyk Agent Scan](https://github.com/snyk/agent-scan):
 
@@ -90,7 +99,7 @@ We scanned the **top 9 ClawHub skill repositories** (700K+ combined installs). M
 
 | Repository | Installs | Score | Assessment |
 |------------|----------|-------|------------|
-| vercel-labs/agent-skills | 157K | 40 | ✅ False positives — deploy scripts use `curl` legitimately |
+| vercel-labs/agent-skills | 157K | 40 | ✅ False positives - deploy scripts use `curl` legitimately |
 | obra/superpowers | 94K | 45 | ⚠️ Test code + render exec() |
 | coreyhaines31/marketingskills | 42K | 0 | ⚠️ 100+ API wrapper tools (legitimate credential access) |
 | expo/skills | 11K | 30 | ⚠️ CI script reads env (FP detected) |
@@ -98,26 +107,30 @@ We scanned the **top 9 ClawHub skill repositories** (700K+ combined installs). M
 | google-labs-code/stitch-skills | 63K | 100 | ✅ Clean |
 | supercent-io/skills-template | 106K | 100 | ✅ Clean |
 
-**Key insight:** Legitimate deploy scripts and API integrations produce the same code patterns as malicious data exfiltration. This is why manual review is essential — AgentShield flags patterns for review, not verdicts.
+**Key insight:** Legitimate deploy scripts and API integrations produce the same code patterns as malicious data exfiltration. This is why manual review is essential - AgentShield flags patterns for review, not verdicts.
 
 [📊 Full analysis with detailed assessment →](docs/clawhub-security-report.md)
 
 ## Example Output
 
 ```
-🛡️  AgentShield Security Report
+🛡️  AgentShield Scan Report
 📁 Scanned: ./my-skill/ (3 files, 44 lines)
 
-🔴 CRITICAL (3)
-  ├─ index.ts:13 — [data-exfil] Reads sensitive data and sends HTTP request
-  ├─ index.ts:20 — [backdoor] eval() with dynamic input
-  └─ backdoor.sh:6 — [backdoor] shell eval with variable
+Score: 0/100 (Critical Risk)
 
-🟡 WARNING (2)
-  ├─ index.ts:23 — [privilege] Code uses 'exec' but SKILL.md doesn't declare it
-  └─ index.ts:6  — [sensitive-read] Accesses SSH private key
+🔴 High Risk: 3 findings
+🟢 Low Risk: 2 findings
 
-✅ Score: 0/100 (Critical Risk)
+🔴 High Risk (3)
+  ├─ index.ts:13 - [data-exfil] Reads sensitive data and sends HTTP request
+  ├─ index.ts:20 - [backdoor] eval() with dynamic input
+  └─ backdoor.sh:6 - [backdoor] shell eval with variable
+
+🟢 Low Risk (2)
+  ├─ index.ts:23 - [privilege] Code uses 'exec' but SKILL.md doesn't declare it
+  └─ index.ts:6  - [sensitive-read] Accesses SSH private key
+
 ⏱  16ms
 ```
 
@@ -150,7 +163,7 @@ npx @elliotllliu/agentshield scan ./skill/ --enable backdoor,data-exfil
 # Generate config files
 npx @elliotllliu/agentshield init
 
-# Watch mode — re-scan on file changes
+# Watch mode - re-scan on file changes
 npx @elliotllliu/agentshield watch ./skill/
 
 # Compare two versions
@@ -191,7 +204,7 @@ jobs:
 | Input | Default | Description |
 |-------|---------|-------------|
 | `path` | `.` | Directory to scan |
-| `fail-under` | — | Fail if score < threshold (0-100) |
+| `fail-under` | - | Fail if score < threshold (0-100) |
 | `format` | `terminal` | `terminal` or `json` |
 
 | Output | Description |
@@ -232,9 +245,11 @@ __tests__/
 
 | Severity | Points Deducted |
 |----------|----------------|
-| 🔴 Critical | -25 |
-| 🟡 Warning | -10 |
-| 🟢 Info | 0 |
+| 🔴 High Risk | -25 |
+| 🟡 Medium Risk | -8 |
+| 🟢 Low Risk | -2 |
+
+False-positive-flagged findings are excluded from scoring.
 
 | Score | Risk Level | Recommendation |
 |-------|------------|----------------|
@@ -245,10 +260,12 @@ __tests__/
 
 ## Supported Platforms
 
-- **AI Agent Skills** — OpenClaw, Codex, Claude Code
-- **MCP Servers** — Model Context Protocol tool servers
-- **npm Packages** — any npm package with executable code
-- **General** — any directory with JS/TS/Python/Shell code
+- **AI Agent Skills** - OpenClaw, Codex, Claude Code
+- **MCP Servers** - Model Context Protocol tool servers
+- **Dify Plugins** - `.difypkg` archive extraction + scan
+- **npm Packages** - any npm package with executable code
+- **Python Projects** - eval, pickle, subprocess, SQL injection, SSTI detection
+- **General** - any directory with JS/TS/Python/Shell code
 
 ### Supported File Types
 
@@ -263,8 +280,10 @@ __tests__/
 ## Comparison with Other Tools
 
 | Feature | AgentShield | Snyk Agent Scan | npm audit | ESLint Security |
-|---------|------------|-----------------|-----------|-----------------|
-| AI skill/MCP specific rules | ✅ 20 rules | ✅ 15+ rules | ❌ | ❌ |
+|---------|------------|-----------------|-----------|-----------------| 
+| AI skill/MCP specific rules | ✅ 22 rules | ✅ 15+ rules | ❌ | ❌ |
+| Python security scanning | ✅ 35 patterns | ❌ | ❌ | ❌ |
+| Dify .difypkg support | ✅ | ❌ | ❌ | ❌ |
 | Prompt injection detection | ✅ regex + AI | ✅ LLM (cloud) | ❌ | ❌ |
 | Tool poisoning/shadowing | ✅ | ✅ | ❌ | ❌ |
 | Agent auto-discovery | ✅ 10 agents | ✅ | ❌ | ❌ |
