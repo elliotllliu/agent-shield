@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Agent Shield Detection Benchmark Runner
+ * AgentShield Detection Benchmark Runner
  *
  * Evaluates detection accuracy across malicious and benign samples.
  * Computes recall, false positive rate, precision, and F1 score.
@@ -122,7 +122,7 @@ function runBenchmark() {
   console.log(`  Accuracy:  ${(accuracy * 100).toFixed(1)}%`);
 
   // Write results to file
-  const report = `# Agent Shield Benchmark Results
+  const report = `# AgentShield Benchmark Results
 
 Generated: ${new Date().toISOString()}
 Duration: ${duration}ms

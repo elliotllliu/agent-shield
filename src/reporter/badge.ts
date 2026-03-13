@@ -13,8 +13,8 @@ export function generateBadgeSvg(result: ScanResult): string {
   const valueWidth = 60;
   const totalWidth = labelWidth + valueWidth;
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="20" role="img" aria-label="Agent Shield: ${scoreText}">
-  <title>Agent Shield: ${scoreText} (${label})</title>
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="20" role="img" aria-label="AgentShield: ${scoreText}">
+  <title>AgentShield: ${scoreText} (${label})</title>
   <linearGradient id="s" x2="0" y2="100%">
     <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
     <stop offset="1" stop-opacity=".1"/>
@@ -28,8 +28,8 @@ export function generateBadgeSvg(result: ScanResult): string {
     <rect width="${totalWidth}" height="20" fill="url(#s)"/>
   </g>
   <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
-    <text aria-hidden="true" x="${labelWidth * 5}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)">${"🛡️ Agent Shield"}</text>
-    <text x="${labelWidth * 5}" y="140" transform="scale(.1)">${"🛡️ Agent Shield"}</text>
+    <text aria-hidden="true" x="${labelWidth * 5}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)">${"🛡️ AgentShield"}</text>
+    <text x="${labelWidth * 5}" y="140" transform="scale(.1)">${"🛡️ AgentShield"}</text>
     <text aria-hidden="true" x="${(labelWidth + valueWidth / 2) * 10}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)">${scoreText}</text>
     <text x="${(labelWidth + valueWidth / 2) * 10}" y="140" transform="scale(.1)">${scoreText}</text>
   </g>
@@ -39,9 +39,9 @@ export function generateBadgeSvg(result: ScanResult): string {
 /** Generate a markdown badge string */
 export function generateBadgeMarkdown(score: number, repoUrl?: string): string {
   const { color, label } = getBadgeStyle(score);
-  const badgeUrl = `https://img.shields.io/badge/Agent Shield-${score}%2F100-${color.replace("#", "")}?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAxTDMgNXY2YzAgNS41NSAzLjg0IDEwLjc0IDkgMTIgNS4xNi0xLjI2IDktNi40NSA5LTEyVjVsLTktNHoiLz48L3N2Zz4=`;
+  const badgeUrl = `https://img.shields.io/badge/AgentShield-${score}%2F100-${color.replace("#", "")}?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAxTDMgNXY2YzAgNS41NSAzLjg0IDEwLjc0IDkgMTIgNS4xNi0xLjI2IDktNi40NSA5LTEyVjVsLTktNHoiLz48L3N2Zz4=`;
   const link = repoUrl || "https://github.com/elliotllliu/agent-shield";
-  return `[![Agent Shield ${score}/100](${badgeUrl})](${link})`;
+  return `[![AgentShield ${score}/100](${badgeUrl})](${link})`;
 }
 
 function getBadgeStyle(score: number): { color: string; label: string } {

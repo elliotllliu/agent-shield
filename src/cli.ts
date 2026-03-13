@@ -191,7 +191,7 @@ program
       return;
     }
 
-    console.log("\n🔄 Agent Shield Comparison\n");
+    console.log("\n🔄 AgentShield Comparison\n");
     console.log(`  A: ${dirA} — Score: ${resultA.score}/100 (${resultA.findings.length} findings)`);
     console.log(`  B: ${dirB} — Score: ${resultB.score}/100 (${resultB.findings.length} findings)`);
     console.log();

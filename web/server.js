@@ -30,9 +30,9 @@ app.get("/badge/:owner/:repo.svg", async (req, res) => {
     const score = result.score;
     const color = score >= 90 ? "4c1" : score >= 70 ? "dfb317" : score >= 40 ? "fe7d37" : "e05d44";
 
-    res.redirect(`https://img.shields.io/badge/Agent Shield-${score}%2F100-${color}?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAxTDMgNXY2YzAgNS41NSAzLjg0IDEwLjc0IDkgMTIgNS4xNi0xLjI2IDktNi40NSA5LTEyVjVsLTktNHoiLz48L3N2Zz4=`);
+    res.redirect(`https://img.shields.io/badge/AgentShield-${score}%2F100-${color}?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAxTDMgNXY2YzAgNS41NSAzLjg0IDEwLjc0IDkgMTIgNS4xNi0xLjI2IDktNi40NSA5LTEyVjVsLTktNHoiLz48L3N2Zz4=`);
   } catch (err) {
-    res.redirect(`https://img.shields.io/badge/Agent Shield-error-lightgrey`);
+    res.redirect(`https://img.shields.io/badge/AgentShield-error-lightgrey`);
   }
 });
 
@@ -93,5 +93,5 @@ async function cloneAndScan(repoUrl, subpath) {
 }
 
 app.listen(PORT, () => {
-  console.log(`🛡️  Agent Shield Web running at http://localhost:${PORT}`);
+  console.log(`🛡️  AgentShield Web running at http://localhost:${PORT}`);
 });

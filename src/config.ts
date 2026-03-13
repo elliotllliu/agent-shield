@@ -2,7 +2,7 @@ import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { parse as parseYaml } from "./yaml-simple.js";
 
-/** Agent Shield configuration */
+/** AgentShield configuration */
 export interface ScanConfig {
   /** Rules to enable (default: all) */
   rules?: {
@@ -17,7 +17,7 @@ export interface ScanConfig {
   ignore?: string[];
 }
 
-const CONFIG_NAMES = [".agent-shield.yml", ".agentshield.yaml", "agent-shield.config.yml"];
+const CONFIG_NAMES = [".agent-shield.yml", ".agent-shield.yaml", "agent-shield.config.yml"];
 
 /** Load config from target directory or parents */
 export function loadConfig(dir: string): ScanConfig {
@@ -71,7 +71,7 @@ export function isIgnored(filePath: string, patterns: string[]): boolean {
 }
 
 /** Default config content for `agent-shield init` */
-export const DEFAULT_CONFIG = `# Agent Shield Configuration
+export const DEFAULT_CONFIG = `# AgentShield Configuration
 # https://github.com/elliotllliu/agent-shield
 
 rules:
@@ -90,7 +90,7 @@ rules:
 `;
 
 /** Default ignore content */
-export const DEFAULT_IGNORE = `# Agent Shield Ignore
+export const DEFAULT_IGNORE = `# AgentShield Ignore
 # Patterns here will be excluded from scanning
 
 node_modules/

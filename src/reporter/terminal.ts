@@ -18,7 +18,7 @@ export function printReport(result: ScanResult): void {
   const { target, filesScanned, linesScanned, findings, score, duration } = result;
 
   console.log();
-  console.log(chalk.bold("🛡️  Agent Shield Scan Report"));
+  console.log(chalk.bold("🛡️  AgentShield Scan Report"));
   console.log(
     chalk.dim(`📁 Scanned: ${target} (${filesScanned} files, ${formatLines(linesScanned)})`),
   );

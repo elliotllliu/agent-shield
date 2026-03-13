@@ -1,13 +1,13 @@
 # 🛡️ ClawHub Security Report — Top Skills Audit
 
-> Scanned by [Agent Shield](https://github.com/elliotllliu/agent-shield) v0.4.x (30 rules, AST taint tracking, cross-file analysis)
+> Scanned by [AgentShield](https://github.com/elliotllliu/agent-shield) v0.4.x (30 rules, AST taint tracking, cross-file analysis)
 > Date: 2026-03-13
 
 ## Summary
 
 We scanned **9 of the most popular skill repositories** on ClawHub, covering skills with **700K+ combined installs**. The goal is to understand the **security surface area** of the AI agent skill ecosystem — not to label any specific project as "insecure."
 
-> ⚠️ **Important context:** Agent Shield uses pattern-based static analysis. It flags code patterns that *could* be dangerous (e.g., reading credentials + making HTTP requests), but **many flagged patterns are legitimate** (API integrations, deploy scripts, etc.). Findings should be reviewed manually — a low score does not mean a project is malicious.
+> ⚠️ **Important context:** AgentShield uses pattern-based static analysis. It flags code patterns that *could* be dangerous (e.g., reading credentials + making HTTP requests), but **many flagged patterns are legitimate** (API integrations, deploy scripts, etc.). Findings should be reviewed manually — a low score does not mean a project is malicious.
 
 | Metric | Value |
 |--------|-------|
@@ -16,7 +16,7 @@ We scanned **9 of the most popular skill repositories** on ClawHub, covering ski
 | Repos with findings requiring review | 6 (67%) |
 | Clean (no findings) | 3 (33%) |
 
-> Scores reflect Agent Shield v0.4.x with smart false-positive detection — test files, deploy scripts, and CI configs are automatically identified and their findings downgraded.
+> Scores reflect AgentShield v0.4.x with smart false-positive detection — test files, deploy scripts, and CI configs are automatically identified and their findings downgraded.
 
 ## Results
 
@@ -36,7 +36,7 @@ We scanned **9 of the most popular skill repositories** on ClawHub, covering ski
 
 ### vercel-labs/agent-skills — False Positives (Score: 40/100)
 
-All 6 findings come from `skills/deploy-to-vercel/resources/deploy.sh` and `deploy-codex.sh`. Agent Shield's FP detection correctly identifies these as **deploy scripts** and downgrades all 6 from critical to warning with "Likely false positive" annotations.
+All 6 findings come from `skills/deploy-to-vercel/resources/deploy.sh` and `deploy-codex.sh`. AgentShield's FP detection correctly identifies these as **deploy scripts** and downgrades all 6 from critical to warning with "Likely false positive" annotations.
 1. Package code into a tarball
 2. POST it to the Vercel deployment API via `curl`
 3. Poll the preview URL for deployment status
@@ -105,7 +105,7 @@ This is why automated scanning is a starting point, not a final verdict.
 1. **Add `permissions` to SKILL.md** — declare what your skill needs
 2. **Separate concerns** — keep deploy/build scripts in clearly labeled directories
 3. **Document credential usage** — explain which env vars are needed and why
-4. **Add Agent Shield to CI** — not to block merges, but to track security surface area
+4. **Add AgentShield to CI** — not to block merges, but to track security surface area
 
 ### For Skill Consumers
 1. **Scan before installing** — `npx @elliotllliu/agent-shield scan ./skill/`
@@ -119,7 +119,7 @@ This is why automated scanning is a starting point, not a final verdict.
 
 ## Methodology & Limitations
 
-- **Tool:** [Agent Shield](https://github.com/elliotllliu/agent-shield) v0.4.x
+- **Tool:** [AgentShield](https://github.com/elliotllliu/agent-shield) v0.4.x
 - **Rules:** 30 security rules (pattern + AST + cross-file analysis)
 - **Scope:** Full repository scan (all files, not just SKILL.md)
 

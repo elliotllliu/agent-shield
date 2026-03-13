@@ -136,7 +136,7 @@ export function discoverAgents(): DiscoveredAgent[] {
 
 export function printDiscovery(agents: DiscoveredAgent[]): void {
   console.log();
-  console.log(chalk.bold("🛡️  Agent Shield Discovery"));
+  console.log(chalk.bold("🛡️  AgentShield Discovery"));
   console.log(chalk.dim(`Scanning for installed AI agents on this machine...`));
   console.log();
 

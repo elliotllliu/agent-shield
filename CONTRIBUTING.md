@@ -1,4 +1,4 @@
-# Contributing to Agent Shield
+# Contributing to AgentShield
 
 Thanks for your interest in making AI agent security better! 🛡️
 

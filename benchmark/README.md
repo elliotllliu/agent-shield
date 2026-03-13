@@ -1,6 +1,6 @@
-# Agent Shield Detection Benchmark
+# AgentShield Detection Benchmark
 
-This benchmark evaluates Agent Shield's detection accuracy across
+This benchmark evaluates AgentShield's detection accuracy across
 multiple attack categories and benign samples.
 
 ## Structure

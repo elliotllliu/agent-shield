@@ -1,6 +1,6 @@
 # Security Rules Reference
 
-Agent Shield v0.4.x ships with **30 built-in security rules** organized into three risk tiers. Each rule is described below with examples and remediation advice.
+AgentShield v0.4.x ships with **30 built-in security rules** organized into three risk tiers. Each rule is described below with examples and remediation advice.
 
 ---
 
