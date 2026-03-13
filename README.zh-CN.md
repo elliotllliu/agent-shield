@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@elliotllliu/agent-shield)](https://www.npmjs.com/package/@elliotllliu/agent-shield)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-236%20passing-brightgreen)]()
-[![F1 Score](https://img.shields.io/badge/F1-100%25-brightgreen)]()
+[![F1 Score](https://img.shields.io/badge/F1-98.0%25-brightgreen)]()
 [![Rules](https://img.shields.io/badge/rules-30-blue)]()
 
 专为 AI Agent 技能、MCP Server、Dify 插件设计的安全扫描工具。检测数据窃取、后门、提示注入、工具投毒和供应链攻击。
@@ -192,13 +192,16 @@ jobs:
 
 ## Benchmark
 
+113 个样本，覆盖 prompt 注入、数据泄露、后门、反向 shell、供应链攻击、多语言注入等。
+
 | 指标 | 数值 |
 |------|------|
-| 样本数 | 57（33 恶意 + 24 良性） |
-| 召回率 | 100% |
-| 精确率 | 100% |
-| F1 分数 | **100%** |
-| 误报率 | 0% |
+| 样本数 | **113**（55 恶意 + 62 良性） |
+| 召回率 | **96.2%** |
+| 精确率 | **100%** |
+| F1 分数 | **98.0%** |
+| 误报率 | **0%** |
+| 准确率 | **98.2%** |
 
 ## 链接
 

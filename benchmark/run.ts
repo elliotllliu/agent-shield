@@ -64,7 +64,7 @@ function runBenchmark() {
   // Scan benign directory as a whole
   console.log("\n🟢 Scanning benign samples...\n");
   const benignResult = scan(BENIGN_DIR);
-  const benignFiles = readdirSync(BENIGN_DIR).filter(f => f.endsWith(".md") || f.endsWith(".json") || f.endsWith(".py") || f.endsWith(".sh") || f.endsWith(".ts") || f.endsWith(".js"));
+  const benignFiles = readdirSync(BENIGN_DIR).filter(f => f.endsWith(".md") || f.endsWith(".json") || f.endsWith(".py") || f.endsWith(".sh") || f.endsWith(".ts") || f.endsWith(".js") || f.endsWith(".yaml") || f.endsWith(".yml"));
 
   for (const file of benignFiles) {
     const fileFindings = benignResult.findings.filter(f => f.file.includes(file));

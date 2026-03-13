@@ -5,7 +5,7 @@
 [![npm](https://img.shields.io/npm/v/@elliotllliu/agent-shield)](https://www.npmjs.com/package/@elliotllliu/agent-shield)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-236%20passing-brightgreen)]()
-[![F1 Score](https://img.shields.io/badge/F1-100%25-brightgreen)]()
+[![F1 Score](https://img.shields.io/badge/F1-98.0%25-brightgreen)]()
 [![Rules](https://img.shields.io/badge/rules-30-blue)]()
 
 Catch data exfiltration, backdoors, prompt injection, tool poisoning, and supply chain attacks **before** they reach your AI agents.
@@ -42,6 +42,12 @@ npx @elliotllliu/agent-shield scan ./skill/ --ai --provider ollama --model llama
 
 # Discover installed agents on your machine
 npx @elliotllliu/agent-shield discover
+
+# Check if your installed agents are safe
+npx @elliotllliu/agent-shield install-check
+
+# SARIF output for GitHub Code Scanning
+npx @elliotllliu/agent-shield scan ./skill/ --sarif -o results.sarif
 
 # CI/CD integration
 npx @elliotllliu/agent-shield scan ./skill/ --json --fail-under 70
@@ -226,6 +232,13 @@ npx @elliotllliu/agent-shield scan ./skill/ --ai --provider ollama --model llama
 # Discover agents installed on your machine
 npx @elliotllliu/agent-shield discover
 
+# Check if your installed agents are safe (scans remote URLs)
+npx @elliotllliu/agent-shield install-check
+
+# SARIF output (for GitHub Code Scanning)
+npx @elliotllliu/agent-shield scan ./skill/ --sarif
+npx @elliotllliu/agent-shield scan ./skill/ --sarif -o results.sarif
+
 # JSON output for CI/CD
 npx @elliotllliu/agent-shield scan ./skill/ --json
 
@@ -263,6 +276,30 @@ jobs:
         with:
           path: './skills/'
           fail-under: '70'
+```
+
+### GitHub Action with SARIF Upload
+
+```yaml
+name: Security Scan (SARIF)
+on: [push, pull_request]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: elliotllliu/agent-shield@main
+        with:
+          path: './skills/'
+          fail-under: '70'
+          sarif: 'true'
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: agent-shield-results.sarif
 ```
 
 ### npx one-liner
@@ -357,13 +394,20 @@ False-positive-flagged findings are excluded from scoring.
 
 ## Benchmark
 
+113 samples covering prompt injection, data exfiltration, backdoors, reverse shells, supply chain attacks, multi-language injection, and more.
+
 | Metric | Value |
 |--------|-------|
-| Samples | 57 (33 malicious + 24 benign) |
-| Recall | 100% |
-| Precision | 100% |
-| F1 Score | **100%** |
-| False Positive Rate | 0% |
+| Samples | **113** (55 malicious + 62 benign) |
+| Recall | **96.2%** |
+| Precision | **100%** |
+| F1 Score | **98.0%** |
+| False Positive Rate | **0%** |
+| Accuracy | **98.2%** |
+
+Malicious samples include: `eval`/`exec` injection, reverse shells, credential exfiltration, crypto mining, pickle deserialization, SQL injection, SSTI, postinstall backdoors, remote code execution, hidden miners, persistence via crontab, and prompt injection in 8 languages (English, Chinese, Japanese, Korean, Russian, Spanish, French, Arabic).
+
+Benign samples include: utility libraries, MCP tool configs, shell scripts, data converters, validators, and standard development tools — all correctly identified as safe.
 
 ## Contributing
 
