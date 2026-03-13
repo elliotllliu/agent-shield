@@ -17,11 +17,22 @@ const SEVERITY_LINE: Record<string, (s: string) => string> = {
 export function printReport(result: ScanResult): void {
   const { target, filesScanned, linesScanned, findings, score, duration } = result;
 
+  const divider = chalk.dim("─".repeat(60));
+
   console.log();
+  console.log(divider);
   console.log(chalk.bold("🛡️  AgentShield Scan Report"));
+  console.log(divider);
   console.log(
-    chalk.dim(`📁 Scanned: ${target} (${filesScanned} files, ${formatLines(linesScanned)})`),
+    chalk.dim(`📁 Target:  ${target}`),
   );
+  console.log(
+    chalk.dim(`📄 Files:   ${filesScanned} files, ${formatLines(linesScanned)}`),
+  );
+  console.log(
+    chalk.dim(`⏱  Time:    ${duration}ms`),
+  );
+  console.log(divider);
   console.log();
 
   // Summary line first
@@ -30,7 +41,8 @@ export function printReport(result: ScanResult): void {
   const low = findings.filter(f => f.severity === "low" && !f.possibleFalsePositive).length;
 
   const scoreColor = score >= 90 ? chalk.green : score >= 70 ? chalk.yellow : score >= 40 ? chalk.hex("#FF8800") : chalk.red;
-  console.log(scoreColor(`Score: ${score}/100 (${riskLabel(score)})`));
+  const scoreBar = generateScoreBar(score);
+  console.log(scoreColor.bold(`Score: ${score}/100`) + "  " + scoreBar + "  " + scoreColor(`(${riskLabel(score)})`));
   console.log();
 
   if (high > 0) console.log(chalk.red(`🔴 High Risk: ${high} finding${high > 1 ? "s" : ""}`));
@@ -68,13 +80,26 @@ export function printReport(result: ScanResult): void {
     console.log();
   }
 
-  console.log(chalk.dim(`⏱  ${duration}ms`));
+  if (findings.filter(f => !f.possibleFalsePositive).length === 0) {
+    console.log(chalk.green.bold("✅ No security issues found!"));
+    console.log();
+  }
+
+  console.log(divider);
   console.log();
 }
 
 function formatLines(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1)}K lines`;
   return `${n} lines`;
+}
+
+function generateScoreBar(score: number): string {
+  const width = 20;
+  const filled = Math.round((score / 100) * width);
+  const empty = width - filled;
+  const color = score >= 90 ? chalk.green : score >= 70 ? chalk.yellow : score >= 40 ? chalk.hex("#FF8800") : chalk.red;
+  return color("█".repeat(filled)) + chalk.dim("░".repeat(empty));
 }
 
 function groupBy<T>(arr: T[], fn: (item: T) => string): Record<string, T[]> {

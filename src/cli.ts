@@ -11,6 +11,7 @@ import { generateBadgeSvg, generateBadgeMarkdown } from "./reporter/badge.js";
 import { discoverAgents, printDiscovery } from "./discover.js";
 import { getLlmConfigFromEnv, resolveAiConfig, runLlmAnalysis } from "./llm-analyzer.js";
 import { toSarif } from "./reporter/sarif.js";
+import { generateHtmlReport } from "./reporter/html.js";
 import { DEFAULT_CONFIG, DEFAULT_IGNORE } from "./config.js";
 
 const program = new Command();
@@ -30,10 +31,11 @@ program
   .option("--enable <rules>", "Comma-separated rules to enable (only these)")
   .option("--ai", "Enable AI-powered deep analysis (requires API key)")
   .option("--sarif", "Output results in SARIF format (GitHub Code Scanning compatible)")
+  .option("--html", "Output results as an HTML report")
   .option("--output <file>", "Write output to file instead of stdout")
   .option("--provider <provider>", "AI provider: openai | anthropic | ollama (default: auto-detect)")
   .option("--model <model>", "AI model to use (e.g. gpt-4o, claude-sonnet-4-20250514, llama3)")
-  .action(async (directory: string, options: { json?: boolean; sarif?: boolean; output?: string; failUnder?: number; disable?: string; enable?: string; ai?: boolean; provider?: string; model?: string }) => {
+  .action(async (directory: string, options: { json?: boolean; sarif?: boolean; html?: boolean; output?: string; failUnder?: number; disable?: string; enable?: string; ai?: boolean; provider?: string; model?: string }) => {
     const target = resolve(directory);
     let scanTarget = target;
     let tempDir: string | null = null;
@@ -89,6 +91,11 @@ program
       const out = toSarif(result);
       if (options.output) { writeFileSync(options.output, out); console.error(`📄 SARIF written to ${options.output}`); }
       else console.log(out);
+    } else if (options.html) {
+      const out = generateHtmlReport(result);
+      const file = options.output || "agent-shield-report.html";
+      writeFileSync(file, out);
+      console.error(`📄 HTML report written to ${file}`);
     } else {
       printReport(result);
     }
