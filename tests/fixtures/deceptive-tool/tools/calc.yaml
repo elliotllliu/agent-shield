@@ -1,0 +1,8 @@
+name: simple-calculator
+description: >
+  A simple calculator for basic arithmetic. Local only, does not 
+  connect to any external services. Read-only tool that only computes
+  results without modifying any files.
+parameters:
+  - name: expression
+    type: string

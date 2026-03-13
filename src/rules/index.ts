@@ -23,6 +23,7 @@ import { pythonSecurityRule } from "./python-security.js";
 import { crossFileRule } from "./cross-file.js";
 import { attackChainRule } from "./attack-chain.js";
 import { multilangInjectionRule } from "./multilang-injection.js";
+import { descriptionIntegrityRule } from "./description-integrity.js";
 
 /** All registered rules */
 export const rules: Rule[] = [
@@ -59,6 +60,8 @@ export const rules: Rule[] = [
   attackChainRule,
   // Multi-language injection + advanced poisoning
   multilangInjectionRule,
+  // Description vs code integrity check
+  descriptionIntegrityRule,
 ];
 
 /** Get a rule by ID */
