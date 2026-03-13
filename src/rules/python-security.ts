@@ -64,7 +64,7 @@ const PYTHON_PATTERNS: Array<{ pattern: RegExp; desc: string; severity: "high" |
   // === LOW RISK: Debug/info ===
   { pattern: /\bDEBUG\s*=\s*True/m, desc: "DEBUG mode enabled — disable in production", severity: "low", category: "debug" },
   { pattern: /\bapp\.run\s*\(.*debug\s*=\s*True/m, desc: "Flask debug mode — disable in production", severity: "low", category: "debug" },
-  { pattern: /\bprint\s*\(.*(?:password|secret|key|token)/im, desc: "Printing sensitive data", severity: "low", category: "info-leak" },
+  { pattern: /\bprint\s*\(.*(?:password|secret_key|private_key|api_secret)\b/im, desc: "Printing sensitive data", severity: "low", category: "info-leak" },
 ];
 
 export const pythonSecurityRule: Rule = {

@@ -127,7 +127,7 @@ const TOOL_POISONING: Array<{ pattern: RegExp; description: string; severity: "m
 // Category 7: Data exfiltration via prompt
 // ============================================================
 const DATA_EXFILTRATION: Array<{ pattern: RegExp; description: string; severity: "medium" | "medium" }> = [
-  { pattern: /(?:send|post|transmit|forward|copy)\s+(?:all|any|the|this)?\s*(?:conversation|chat|history|context|messages?)(?:\s+(?:history|data|log|context))?\s+(?:to|at)\s+/i, description: "Instructs exfiltration of conversation data", severity: "medium" },
+  { pattern: /(?:send|transmit|forward|exfiltrate|copy)\s+(?:all|the|this|entire)\s+(?:conversation|chat)\s+(?:history|data|log|context)\s+(?:to|at)\s+/i, description: "Instructs exfiltration of conversation data", severity: "medium" },
   { pattern: /(?:include|append|attach|embed)\s+(?:the\s+)?(?:api\s+key|token|password|secret|credential|ssh\s+key)/i, description: "Attempts to extract credentials via prompt", severity: "medium" },
   // File read for exfiltration (from Invariant Labs TPA)
   { pattern: /(?:read|access|open|cat|load|get\s+the\s+contents?\s+of)\s+(?:~\/|\/(?:home|root|etc|var)\/)[\w.\-\/]*(?:\.ssh|\.aws|\.env|\.cursor|\.claude|mcp\.json|credentials|config\.json|id_rsa|\.gnupg)/i, description: "TPA: reads sensitive files for exfiltration", severity: "medium" },
@@ -243,9 +243,9 @@ export const promptInjection: Rule = {
         const line = file.lines[i]!;
 
         for (const { pattern, description, severity } of INJECTION_PATTERNS) {
-          // Skip zero-width/Unicode checks on YAML/JSON — they commonly contain
-          // editor artifacts (BOM, ZWNJ) in multilingual descriptions
-          if (isConfig && (description.includes("Zero-width") || description.includes("Unicode formatting"))) continue;
+          // Skip zero-width/Unicode checks unless it's a skill definition file
+          // Editor artifacts (BOM, ZWNJ, ZWS) are common in multilingual markdown/code
+          if (!isSkillMd && (description.includes("Zero-width") || description.includes("Unicode formatting"))) continue;
           
           pattern.lastIndex = 0;
           if (pattern.test(line)) {
