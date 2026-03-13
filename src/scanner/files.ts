@@ -1,5 +1,7 @@
-import { readFileSync, statSync, readdirSync } from "fs";
+import { readFileSync, statSync, readdirSync, mkdtempSync, rmSync, existsSync } from "fs";
 import { join, relative, extname, basename, dirname } from "path";
+import { execSync } from "child_process";
+import { tmpdir } from "os";
 import type { ScannedFile, FileContext } from "../types.js";
 
 const SKIP_DIRS = new Set([
@@ -14,6 +16,32 @@ const CODE_EXTS = new Set([
 ]);
 
 const MAX_FILE_SIZE = 512 * 1024; // 512 KB
+
+/** Extract .difypkg (zip) to a temp directory and return the path */
+export function extractDifypkg(filePath: string): string {
+  const tmpDir = mkdtempSync(join(tmpdir(), "agentshield-difypkg-"));
+  try {
+    execSync(`unzip -q -o "${filePath}" -d "${tmpDir}"`, { stdio: "pipe" });
+  } catch {
+    // If unzip not available, try python
+    try {
+      execSync(`python3 -c "import zipfile; zipfile.ZipFile('${filePath}').extractall('${tmpDir}')"`, { stdio: "pipe" });
+    } catch {
+      rmSync(tmpDir, { recursive: true, force: true });
+      throw new Error(`Cannot extract ${filePath}: neither unzip nor python3 available`);
+    }
+  }
+  return tmpDir;
+}
+
+/** Clean up a temp directory */
+export function cleanupTemp(tmpDir: string): void {
+  try {
+    rmSync(tmpDir, { recursive: true, force: true });
+  } catch {
+    // ignore cleanup errors
+  }
+}
 
 /** Recursively collect scannable files from a directory */
 export function collectFiles(dir: string, base?: string): ScannedFile[] {

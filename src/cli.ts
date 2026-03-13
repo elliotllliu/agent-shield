@@ -4,6 +4,7 @@ import { Command } from "commander";
 import { resolve, join } from "path";
 import { existsSync, statSync, writeFileSync, watch as fsWatch, mkdirSync } from "fs";
 import { scan } from "./scanner/index.js";
+import { extractDifypkg, cleanupTemp } from "./scanner/files.js";
 import { printReport } from "./reporter/terminal.js";
 import { printJsonReport } from "./reporter/json.js";
 import { generateBadgeSvg, generateBadgeMarkdown } from "./reporter/badge.js";
@@ -31,8 +32,18 @@ program
   .option("--model <model>", "AI model to use (e.g. gpt-4o, claude-sonnet-4-20250514, llama3)")
   .action(async (directory: string, options: { json?: boolean; failUnder?: number; disable?: string; enable?: string; ai?: boolean; provider?: string; model?: string }) => {
     const target = resolve(directory);
+    let scanTarget = target;
+    let tempDir: string | null = null;
 
-    if (!existsSync(target) || !statSync(target).isDirectory()) {
+    // Support .difypkg files (zip archives)
+    if (target.endsWith(".difypkg") || target.endsWith(".zip")) {
+      if (!existsSync(target) || !statSync(target).isFile()) {
+        console.error(`Error: "${directory}" is not a valid file`);
+        process.exit(1);
+      }
+      tempDir = extractDifypkg(target);
+      scanTarget = tempDir;
+    } else if (!existsSync(target) || !statSync(target).isDirectory()) {
       console.error(`Error: "${directory}" is not a valid directory`);
       process.exit(1);
     }
@@ -48,7 +59,7 @@ program
       }
     }
 
-    const result = scan(target, configOverride);
+    const result = scan(scanTarget, configOverride);
 
     // AI-powered deep analysis (optional)
     if (options.ai) {
@@ -75,8 +86,10 @@ program
 
     const threshold = options.failUnder ?? result.score;
     if (options.failUnder !== undefined && result.score < options.failUnder) {
+      if (tempDir) cleanupTemp(tempDir);
       process.exit(1);
     }
+    if (tempDir) cleanupTemp(tempDir);
   });
 
 program

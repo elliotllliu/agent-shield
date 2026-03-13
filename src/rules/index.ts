@@ -19,6 +19,7 @@ import { promptInjection } from "./prompt-injection.js";
 import { toolShadowing } from "./tool-shadowing.js";
 import { skillRisks } from "./skill-risks.js";
 import { toxicFlow } from "./toxic-flow.js";
+import { pythonSecurityRule } from "./python-security.js";
 
 /** All registered rules */
 export const rules: Rule[] = [
@@ -47,6 +48,8 @@ export const rules: Rule[] = [
   skillRisks,
   // Toxic flow analysis
   toxicFlow,
+  // Python-specific security
+  pythonSecurityRule,
 ];
 
 /** Get a rule by ID */
