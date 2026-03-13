@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { resolve, join } from "path";
+import { resolve, join, basename } from "path";
 import { existsSync, statSync, writeFileSync, watch as fsWatch, mkdirSync } from "fs";
 import { scan } from "./scanner/index.js";
-import { extractDifypkg, cleanupTemp } from "./scanner/files.js";
+import { extractDifypkg, cleanupTemp, collectFiles } from "./scanner/files.js";
 import { printReport } from "./reporter/terminal.js";
 import { printJsonReport } from "./reporter/json.js";
 import { generateBadgeSvg, generateBadgeMarkdown } from "./reporter/badge.js";
@@ -12,7 +12,10 @@ import { discoverAgents, printDiscovery } from "./discover.js";
 import { getLlmConfigFromEnv, resolveAiConfig, runLlmAnalysis } from "./llm-analyzer.js";
 import { toSarif } from "./reporter/sarif.js";
 import { generateHtmlReport } from "./reporter/html.js";
-import { DEFAULT_CONFIG, DEFAULT_IGNORE } from "./config.js";
+import { DEFAULT_CONFIG, DEFAULT_IGNORE, loadConfig } from "./config.js";
+import { generateManifest, saveManifest, loadManifest, verifyManifest, hashFiles, contentHash } from "./provenance.js";
+import { evaluatePolicy, getAgentPolicy, POLICY_PRESETS } from "./policy.js";
+import { letterGrade } from "./score.js";
 
 const program = new Command();
 
@@ -75,7 +78,7 @@ program
       }
       const providerLabel = options.provider || "auto";
       console.error(`🤖 Running AI analysis (${providerLabel}/${llmConfig.model})...`);
-      const { collectFiles } = await import("./scanner/files.js");
+      
       const files = collectFiles(target);
       const llmFindings = await runLlmAnalysis(files, llmConfig);
       result.findings.push(...llmFindings);
@@ -141,10 +144,12 @@ program
 
 program
   .command("watch")
-  .description("Watch a directory and re-scan on file changes")
+  .description("Watch a directory and re-scan on file changes (with content hash dedup)")
   .argument("<directory>", "Target directory to watch")
   .option("--json", "Output results as JSON")
-  .action((directory: string, options: { json?: boolean }) => {
+  .option("--verify", "Verify against saved provenance manifest on each scan")
+  .option("--agent <name>", "Evaluate against agent-specific security policy")
+  .action((directory: string, options: { json?: boolean; verify?: boolean; agent?: string }) => {
     const target = resolve(directory);
     if (!existsSync(target) || !statSync(target).isDirectory()) {
       console.error(`Error: "${directory}" is not a valid directory`);
@@ -153,14 +158,58 @@ program
 
     console.log(`👀 Watching ${target} for changes... (Ctrl+C to stop)\n`);
 
+    let lastHash = "";
+
     const runScan = () => {
+      const result = scan(target);
+
+      // Content hash dedup — skip if nothing changed
+      
+      const files = collectFiles(target);
+      const currentHashes = hashFiles(files);
+      const currentHash = contentHash(currentHashes);
+
+      if (currentHash === lastHash) return; // no actual change
+      lastHash = currentHash;
+
       console.clear();
       console.log(`👀 Watching ${target} — last scan: ${new Date().toLocaleTimeString()}\n`);
-      const result = scan(target);
+
       if (options.json) {
         printJsonReport(result);
       } else {
         printReport(result);
+      }
+
+      // Provenance verification
+      if (options.verify) {
+        const manifest = loadManifest(target);
+        if (manifest) {
+          const verification = verifyManifest(files, manifest);
+          if (!verification.valid) {
+            console.log("\n⚠️  Provenance changed since last manifest:");
+            if (verification.changed.length) console.log(`   Modified: ${verification.changed.join(", ")}`);
+            if (verification.added.length) console.log(`   Added: ${verification.added.join(", ")}`);
+            if (verification.removed.length) console.log(`   Removed: ${verification.removed.join(", ")}`);
+          } else {
+            console.log("\n✅ Provenance verified — no unexpected changes");
+          }
+        }
+      }
+
+      // Agent policy evaluation
+      if (options.agent) {
+        const config = loadConfig(target);
+        const policy = getAgentPolicy(config, options.agent);
+        if (policy) {
+          const evaluation = evaluatePolicy(result, policy);
+          if (evaluation.pass) {
+            console.log(`\n✅ Policy check passed for agent "${options.agent}"`);
+          } else {
+            console.log(`\n🚫 Policy FAILED for agent "${options.agent}":`);
+            evaluation.reasons.forEach((r) => console.log(`   - ${r}`));
+          }
+        }
       }
     };
 
@@ -358,7 +407,7 @@ program
         process.exit(1);
       }
       console.error(`🤖 Running AI analysis...`);
-      const { collectFiles } = await import("./scanner/files.js");
+      
       const files = collectFiles(scanDir);
       const llmFindings = await runLlmAnalysis(files, llmConfig);
       result.findings.push(...llmFindings);
@@ -493,9 +542,130 @@ program
     }
   });
 
+// ─── Provenance commands ───
+
+program
+  .command("provenance")
+  .description("Generate a content hash manifest for provenance tracking")
+  .argument("<directory>", "Target directory")
+  .option("--name <name>", "Skill/plugin name")
+  .option("--tag <tag>", "Version tag string", "0.0.0")
+  .action((directory: string, options: { name?: string; tag?: string }) => {
+    const target = resolve(directory);
+    if (!existsSync(target)) { console.error(`Error: "${directory}" not found`); process.exit(1); }
+
+    
+    const files = collectFiles(target);
+    const result = scan(target);
+    const grade = result.scoreResult?.grade ?? letterGrade(result.score);
+
+    const manifest = generateManifest(
+      options.name || basename(target),
+      options.tag || "0.0.0",
+      files,
+      grade,
+      result.score,
+    );
+
+    const path = saveManifest(target, manifest);
+    console.log(`✅ Manifest saved to ${path}`);
+    console.log(`   Content hash: ${manifest.contentHash}`);
+    console.log(`   Files: ${Object.keys(manifest.files).length}`);
+    console.log(`   Grade: ${grade} (${result.score})`);
+  });
+
+program
+  .command("verify")
+  .description("Verify files against saved provenance manifest")
+  .argument("<directory>", "Target directory")
+  .action((directory: string) => {
+    const target = resolve(directory);
+    const manifest = loadManifest(target);
+    if (!manifest) {
+      console.error("❌ No manifest found. Run `agent-shield provenance <dir>` first.");
+      process.exit(1);
+    }
+
+    
+    const files = collectFiles(target);
+    const verification = verifyManifest(files, manifest);
+
+    if (verification.valid) {
+      console.log(`✅ Provenance verified — content matches manifest`);
+      console.log(`   Hash: ${manifest.contentHash}`);
+      console.log(`   Created: ${manifest.createdAt}`);
+      console.log(`   Grade at creation: ${manifest.grade} (${manifest.score})`);
+    } else {
+      console.log(`⚠️  Content has changed since manifest was created`);
+      if (verification.changed.length) {
+        console.log(`\n   Modified files (${verification.changed.length}):`);
+        verification.changed.forEach((f) => console.log(`     📝 ${f}`));
+      }
+      if (verification.added.length) {
+        console.log(`\n   New files (${verification.added.length}):`);
+        verification.added.forEach((f) => console.log(`     ➕ ${f}`));
+      }
+      if (verification.removed.length) {
+        console.log(`\n   Removed files (${verification.removed.length}):`);
+        verification.removed.forEach((f) => console.log(`     ➖ ${f}`));
+      }
+      console.log(`\n   Run \`agent-shield provenance ${directory}\` to update the manifest.`);
+
+      // Re-scan and compare grades
+      const result = scan(target);
+      const currentGrade = result.scoreResult?.grade ?? letterGrade(result.score);
+      if (manifest.grade && currentGrade !== manifest.grade) {
+        console.log(`\n   ⚠️  Grade changed: ${manifest.grade} → ${currentGrade}`);
+      }
+      process.exit(1);
+    }
+  });
+
+// ─── Policy command ───
+
+program
+  .command("policy")
+  .description("Evaluate scan against per-agent security policy")
+  .argument("<directory>", "Target directory")
+  .argument("<agent>", "Agent name (from .agent-shield.yml agents section)")
+  .option("--preset <preset>", "Use preset policy: strict | standard | permissive")
+  .action((directory: string, agent: string, options: { preset?: string }) => {
+    const target = resolve(directory);
+    if (!existsSync(target)) { console.error(`Error: "${directory}" not found`); process.exit(1); }
+
+    const result = scan(target);
+    const config = loadConfig(target);
+
+    let policy = getAgentPolicy(config, agent);
+    if (!policy && options.preset) {
+      policy = POLICY_PRESETS[options.preset] ?? null;
+    }
+    if (!policy) {
+      console.error(`❌ No policy found for agent "${agent}". Define it in .agent-shield.yml or use --preset.`);
+      console.error(`   Available presets: strict, standard, permissive`);
+      process.exit(1);
+    }
+
+    const grade = result.scoreResult?.grade ?? letterGrade(result.score);
+    console.log(`🛡️  Policy evaluation for agent "${agent}"`);
+    console.log(`   Score: ${result.score} (${grade})`);
+    console.log(`   Policy: minGrade=${policy.minGrade}${policy.minScore ? ` minScore=${policy.minScore}` : ""}${policy.maxSeverity ? ` maxSeverity=${policy.maxSeverity}` : ""}`);
+    if (policy.blockRules?.length) console.log(`   Blocked rules: ${policy.blockRules.join(", ")}`);
+    console.log();
+
+    const evaluation = evaluatePolicy(result, policy);
+    if (evaluation.pass) {
+      console.log(`✅ PASS — this skill meets the security requirements for "${agent}"`);
+    } else {
+      console.log(`🚫 FAIL — this skill does NOT meet the security requirements:`);
+      evaluation.reasons.forEach((r) => console.log(`   ❌ ${r}`));
+      process.exit(1);
+    }
+  });
+
 // Default: if first arg looks like a directory, treat as scan
 const args = process.argv.slice(2);
-if (args.length > 0 && !args[0]!.startsWith("-") && !["scan", "init", "watch", "compare", "badge", "discover", "install-check", "proxy", "mcp-audit", "help"].includes(args[0]!)) {
+if (args.length > 0 && !args[0]!.startsWith("-") && !["scan", "init", "watch", "compare", "badge", "discover", "install-check", "proxy", "mcp-audit", "provenance", "verify", "policy", "help"].includes(args[0]!)) {
   process.argv.splice(2, 0, "scan");
 }
 

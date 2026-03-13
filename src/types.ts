@@ -105,3 +105,48 @@ export interface ScanConfig {
   failUnder?: number;
   ignore?: string[];
 }
+
+/** Per-agent security policy */
+export interface AgentPolicy {
+  /** Minimum grade required (A/B/C/D/F) */
+  minGrade: Grade;
+  /** Minimum numeric score */
+  minScore?: number;
+  /** Rules that must not trigger */
+  blockRules?: string[];
+  /** Maximum allowed severity */
+  maxSeverity?: Severity;
+}
+
+/** Extended config with agent policies and provenance */
+export interface AgentShieldConfig extends ScanConfig {
+  /** Per-agent security policies */
+  agents?: Record<string, AgentPolicy>;
+  /** Default policy for agents not explicitly listed */
+  defaultPolicy?: AgentPolicy;
+  /** Provenance settings */
+  provenance?: {
+    /** Path to store hash manifests */
+    manifestDir?: string;
+    /** Auto-verify on scan */
+    autoVerify?: boolean;
+  };
+}
+
+/** Content hash manifest for provenance tracking */
+export interface ProvenanceManifest {
+  /** Skill/plugin name */
+  name: string;
+  /** Version string */
+  version: string;
+  /** ISO timestamp of manifest creation */
+  createdAt: string;
+  /** SHA-256 hash of concatenated file hashes */
+  contentHash: string;
+  /** Per-file hashes */
+  files: Record<string, string>;
+  /** Scan grade at time of manifest */
+  grade?: Grade;
+  /** Scan score at time of manifest */
+  score?: number;
+}

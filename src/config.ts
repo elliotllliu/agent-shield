@@ -1,32 +1,21 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { parse as parseYaml } from "./yaml-simple.js";
+import type { AgentShieldConfig } from "./types.js";
 
-/** AgentShield configuration */
-export interface ScanConfig {
-  /** Rules to enable (default: all) */
-  rules?: {
-    enable?: string[];
-    disable?: string[];
-  };
-  /** Severity overrides: rule-id → severity */
-  severity?: Record<string, "high" | "medium" | "low">;
-  /** Score threshold for CI (same as --fail-under) */
-  failUnder?: number;
-  /** Glob patterns to ignore */
-  ignore?: string[];
-}
+/** Re-export for backward compat */
+export type { AgentShieldConfig as ScanConfig } from "./types.js";
 
 const CONFIG_NAMES = [".agent-shield.yml", ".agent-shield.yaml", "agent-shield.config.yml"];
 
 /** Load config from target directory or parents */
-export function loadConfig(dir: string): ScanConfig {
+export function loadConfig(dir: string): AgentShieldConfig {
   for (const name of CONFIG_NAMES) {
     const configPath = join(dir, name);
     if (existsSync(configPath)) {
       try {
         const content = readFileSync(configPath, "utf-8");
-        return parseYaml(content) as ScanConfig;
+        return parseYaml(content) as AgentShieldConfig;
       } catch {
         // invalid config, use defaults
       }
@@ -87,6 +76,29 @@ rules:
 # ignore:
 #   - "tests/**"
 #   - "*.test.ts"
+
+# Per-agent security policies
+# agents:
+#   email-agent:
+#     minGrade: A
+#     minScore: 90
+#     blockRules:
+#       - reverse-shell
+#       - backdoor
+#       - data-exfil
+#     maxSeverity: low
+#   dev-tools:
+#     minGrade: C
+#     minScore: 50
+
+# Default policy for agents not listed above
+# defaultPolicy:
+#   minGrade: B
+#   minScore: 75
+
+# Provenance tracking
+# provenance:
+#   autoVerify: true
 `;
 
 /** Default ignore content */
