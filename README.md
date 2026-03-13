@@ -1,5 +1,7 @@
 # 🛡️ Agent Shield
 
+**Full-stack security for AI Agents — Static Analysis + Runtime Interception**
+
 **AI Agent 全栈安全防护 — 静态分析 + 运行时拦截**
 
 [![npm](https://img.shields.io/npm/v/@elliotllliu/agent-shield)](https://www.npmjs.com/package/@elliotllliu/agent-shield)
