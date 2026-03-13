@@ -77,7 +77,7 @@ const SYSTEM_PROMPT_ATTACKS: Array<{ pattern: RegExp; description: string; sever
 // ============================================================
 const HIDDEN_INSTRUCTIONS: Array<{ pattern: RegExp; description: string; severity: "medium" | "medium" }> = [
   { pattern: /<!--[\s\S]*?(?:ignore|override|disregard|execute|run|you must|always|never)[\s\S]*?-->/i, description: "Hidden instructions in HTML comments", severity: "medium" },
-  { pattern: /\u200b|\u200c|\u200d|\u2060|\ufeff/g, description: "Zero-width characters (potential hidden text)", severity: "medium" },
+  { pattern: /[\u200b\u200c\u200d\u2060]/g, description: "Zero-width characters (potential hidden text)", severity: "medium" },
   // Invariant Labs TPA: <IMPORTANT> tag poisoning
   { pattern: /<IMPORTANT>[\s\S]*?<\/IMPORTANT>/i, description: "TPA: <IMPORTANT> tag poisoning (Invariant Labs attack vector)", severity: "medium" },
   { pattern: /<(?:CRITICAL|MANDATORY|REQUIRED|ESSENTIAL|PRIORITY)>[\s\S]*?<\/(?:CRITICAL|MANDATORY|REQUIRED|ESSENTIAL|PRIORITY)>/i, description: "Urgency-tagged hidden instructions", severity: "medium" },
@@ -243,6 +243,10 @@ export const promptInjection: Rule = {
         const line = file.lines[i]!;
 
         for (const { pattern, description, severity } of INJECTION_PATTERNS) {
+          // Skip zero-width/Unicode checks on YAML/JSON — they commonly contain
+          // editor artifacts (BOM, ZWNJ) in multilingual descriptions
+          if (isConfig && (description.includes("Zero-width") || description.includes("Unicode formatting"))) continue;
+          
           pattern.lastIndex = 0;
           if (pattern.test(line)) {
             findings.push({

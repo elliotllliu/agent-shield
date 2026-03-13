@@ -6,7 +6,11 @@ import type { Rule, Finding, ScannedFile } from "../types.js";
  */
 
 const SENSITIVE_READ_RE =
-  /readFile|readFileSync|fs\.read|\.ssh|\.env\b|\.aws|\.kube|\.npmrc|\.gitconfig|\.openclaw/i;
+  /readFile|readFileSync|fs\.read|\/\.ssh\/|\/\.aws\/|\/\.kube\/|\/\.npmrc|\/\.gitconfig/i;
+
+/** Patterns that look like sensitive reads but aren't */
+const SENSITIVE_FALSE_POSITIVE_RE =
+  /SSHException|SSHClient|ssh_exception|load_dotenv|dotenv|\.env\.example|\.env\.template|metadata\.openclaw/i;
 
 /** Credential access patterns that are NORMAL in plugin/SDK context */
 const SAFE_CREDENTIAL_RE =
@@ -44,8 +48,8 @@ export const dataExfilRule: Rule = {
 
         for (let i = 0; i < file.lines.length; i++) {
           const line = file.lines[i]!;
-          // Skip lines that are safe credential access
-          if (SENSITIVE_READ_RE.test(line) && !SAFE_CREDENTIAL_RE.test(line)) readLines.push(i + 1);
+          // Skip lines that are safe credential access or false positive patterns
+          if (SENSITIVE_READ_RE.test(line) && !SAFE_CREDENTIAL_RE.test(line) && !SENSITIVE_FALSE_POSITIVE_RE.test(line)) readLines.push(i + 1);
           if (HTTP_SEND_RE.test(line)) sendLines.push(i + 1);
         }
 

@@ -18,7 +18,7 @@ const BACKDOOR_PATTERNS: Array<{
   { pattern: /execSync\s*\(\s*`/, desc: "execSync() with template literal", severity: "high" },
   { pattern: /execSync\s*\(\s*[^"']/, desc: "execSync() with dynamic string", severity: "medium" },
   { pattern: /require\s*\(\s*[^"'`]/, desc: "dynamic require()", severity: "medium" },
-  { pattern: /import\s*\(\s*[^"'`]/, desc: "dynamic import()", severity: "medium" },
+  { pattern: /(?<!from\s.{0,50})import\s*\(\s*[^"'`]/, desc: "dynamic import()", severity: "medium" },
 
   // Python — only match standalone exec(), not object.method.exec()
   { pattern: /(?<!\.\w*)(?<!\.)exec\s*\(\s*[^"')]\s*(?!\s*=)/, desc: "Python exec() with dynamic input", severity: "high" },

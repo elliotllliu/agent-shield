@@ -6,6 +6,8 @@ import type { ScannedFile, FileContext } from "../types.js";
 
 const SKIP_DIRS = new Set([
   "node_modules", ".git", "dist", "build", "__pycache__", ".venv", "venv",
+  "site-packages", "dist-packages", ".eggs", "egg-info",
+  "Lib", "lib64", ".tox", ".nox",
 ]);
 
 const CODE_EXTS = new Set([
@@ -111,6 +113,9 @@ function detectFileContext(relativePath: string, fileName: string): FileContext 
     lowerName.includes("_test.") || lowerName.includes("_spec.") ||
     lowerPath.includes("__tests__") || lowerPath.includes("/tests/") ||
     lowerPath.startsWith("tests/") || lowerPath.startsWith("test/") ||
+    lowerPath.includes("/performance/") || lowerPath.startsWith("performance/") ||
+    lowerPath.includes("/benchmark/") || lowerPath.startsWith("benchmark/") ||
+    lowerName.startsWith("locustfile") || lowerName.startsWith("conftest") ||
     lowerName === "jest.config.js" || lowerName === "vitest.config.ts"
   ) {
     return "test";

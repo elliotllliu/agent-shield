@@ -43,7 +43,7 @@ const PYTHON_PATTERNS: Array<{ pattern: RegExp; desc: string; severity: "high" |
   { pattern: /\braw\s*\(\s*f?["'].*(?:SELECT|INSERT|UPDATE|DELETE|DROP)/im, desc: "Django raw SQL with string interpolation", severity: "medium", category: "sql-injection" },
   
   // === MEDIUM RISK: Path traversal ===
-  { pattern: /open\s*\(\s*(?:os\.path\.join\s*\()?.*(?:request|input|params|user|filename)/m, desc: "open() with user-controlled path — path traversal risk", severity: "medium", category: "path-traversal" },
+  { pattern: /open\s*\(\s*(?:os\.path\.join\s*\()?.*(?:request\.|params\[|query\[|form\[|args\[)/m, desc: "open() with web request input — path traversal risk", severity: "medium", category: "path-traversal" },
   { pattern: /send_file\s*\(\s*(?!['"])/m, desc: "Flask send_file with variable — path traversal risk", severity: "medium", category: "path-traversal" },
   
   // === MEDIUM RISK: Insecure network ===
