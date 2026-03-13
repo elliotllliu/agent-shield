@@ -9,12 +9,16 @@ import type { LlmProvider } from "../llm/types.js";
 const FP_CONTEXTS: Record<string, string> = {
   test: "Test file — assertions and mocks commonly trigger security patterns",
   deploy: "Deploy/CI script — HTTP requests and credential access are expected",
+  docs: "Documentation file — code examples and descriptions commonly trigger patterns",
+  config: "Config file — expected to contain URLs, paths, and credential references",
 };
 
 /** Rules most likely to false-positive in specific contexts */
 const CONTEXT_FP_RULES: Record<string, Set<string>> = {
-  test: new Set(["data-exfil", "env-leak", "backdoor", "network-ssrf", "sensitive-read", "phone-home"]),
-  deploy: new Set(["data-exfil", "env-leak", "backdoor", "network-ssrf", "credential-hardcode"]),
+  test: new Set(["data-exfil", "env-leak", "backdoor", "network-ssrf", "sensitive-read", "phone-home", "obfuscation", "crypto-mining", "reverse-shell", "credential-hardcode", "skill-risks"]),
+  deploy: new Set(["data-exfil", "env-leak", "backdoor", "network-ssrf", "credential-hardcode", "sensitive-read", "skill-risks"]),
+  docs: new Set(["data-exfil", "env-leak", "backdoor", "network-ssrf", "sensitive-read", "obfuscation", "crypto-mining", "reverse-shell", "credential-hardcode", "skill-risks"]),
+  config: new Set(["data-exfil", "env-leak", "credential-hardcode", "network-ssrf"]),
 };
 
 /** Run all rules against a target directory */
@@ -71,6 +75,8 @@ function postProcess(findings: Finding[], files: ScannedFile[], config: ScanConf
     const file = files.find(
       (f) => f.relativePath === finding.file || f.path === finding.file
     );
+
+    // Context-based FP detection
     if (file && FP_CONTEXTS[file.context]) {
       const fpRules = CONTEXT_FP_RULES[file.context];
       if (fpRules?.has(finding.rule)) {
@@ -83,7 +89,48 @@ function postProcess(findings: Finding[], files: ScannedFile[], config: ScanConf
         }
       }
     }
+
+    // Security tool self-reference detection:
+    // If a file is a rule definition (contains regex patterns as data),
+    // its matches on code-analysis rules are likely false positives
+    if (file) {
+      const isRuleFile = file.relativePath.includes("rules/") && file.ext === ".ts";
+      const isSecurityToolCode = file.relativePath.includes("llm/") ||
+        file.relativePath.includes("llm-analyzer") ||
+        file.relativePath.includes("scanner/") ||
+        file.relativePath.includes("reporter/") ||
+        file.relativePath.includes("score.");
+      if (isRuleFile || isSecurityToolCode) {
+        const codeAnalysisRules = new Set([
+          "data-exfil", "backdoor", "obfuscation", "env-leak",
+          "crypto-mining", "reverse-shell", "sensitive-read",
+          "network-ssrf", "credential-hardcode", "mcp-manifest",
+          "skill-risks",
+        ]);
+        if (codeAnalysisRules.has(finding.rule)) {
+          finding.possibleFalsePositive = true;
+          finding.falsePositiveReason = "Security tool source code — pattern definitions are not actual vulnerabilities";
+          if (finding.severity === "critical") {
+            finding.severity = "info";
+          } else if (finding.severity === "warning") {
+            finding.severity = "info";
+          }
+        }
+      }
+    }
+
+    // Evidence-based FP: regex pattern strings (common in security tools)
+    if (finding.evidence) {
+      const isRegexDef = /(?:pattern|RegExp|\/[^/]+\/[gimsuy]*|new RegExp)\s*[:=(]/.test(finding.evidence);
+      const isStringDef = /(?:const|let|var)\s+\w+\s*=\s*["'`]/.test(finding.evidence);
+      if (isRegexDef && !finding.possibleFalsePositive) {
+        finding.possibleFalsePositive = true;
+        finding.falsePositiveReason = "Pattern definition — regex/string constant, not executable code";
+        if (finding.severity !== "info") finding.severity = "info";
+      }
+    }
   }
+
   if (config.severity) {
     for (const finding of findings) {
       if (config.severity[finding.rule]) {
