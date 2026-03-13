@@ -348,78 +348,110 @@ False-positive-flagged findings are excluded from scoring.
 
 ## 🔌 Integrate AgentShield Into Your Platform
 
-**Running a skill directory, MCP marketplace, or plugin registry?** Add AgentShield scanning and give your users something no other platform offers: **verified security scores for every listing.**
+> **Running a skill marketplace, MCP directory, or plugin registry? This section is for you.**
 
-### Why Integrate
+### The Problem You're Sitting On
 
-In 2026, Snyk scanned a major agent skills registry and found **36% of skills contained security flaws** — 1,467 malicious payloads across one platform. Your users are installing these tools into AI agents that have access to files, credentials, and APIs. A single malicious skill can steal everything.
+Your platform lists hundreds (or thousands) of skills, MCP servers, and plugins. Users install them into AI agents that have access to **files, credentials, APIs, and shell commands**. But right now:
 
-**No skill directory currently verifies what it lists.** Be the first.
+- ❌ **Nobody verifies what gets listed.** A skill with `eval(atob(...))` looks the same as a clean one.
+- ❌ **Users can't tell safe from dangerous.** There's no security signal anywhere in the UI.
+- ❌ **One bad skill = total compromise.** Data exfiltration, credential theft, reverse shells — all from a single install.
 
-### What Your Platform Gets
+In our scan of **493 Dify plugins**, we found **17 high-risk plugins (3.4%)** with real threats: `eval()` execution, pipe-to-shell patterns, and cross-file injection chains. These are live, published plugins that anyone can install right now.
 
-| Benefit | Detail |
-|---------|--------|
-| 🏆 **Trust differentiation** | You become the only directory where users can verify before they install |
-| 🛡️ **Security badges** | Every skill gets a 🟢🟡🟠🔴 score — users see risk at a glance |
-| 🔍 **Smart filtering** | Users filter by security level, sort by score, hide risky skills |
-| 📊 **Launch story** | "We scanned 19,000 skills — here's what we found" — instant PR |
-| 🆓 **Zero cost** | MIT licensed, runs on your server, no API fees |
-| 🔒 **Zero data sharing** | 100% offline — nothing leaves your infrastructure |
-| ⚡ **Fast** | ~200ms per skill. 10,000 skills in ~17 minutes (4 parallel) |
+**No skill platform currently verifies what it lists.** That's your opportunity.
+
+### What You Get By Integrating
+
+| | Without AgentShield | With AgentShield |
+|---|---|---|
+| **User trust** | "Is this skill safe?" — users have no idea | 🟢🟡🟠🔴 Security score on every listing |
+| **Platform reputation** | Same as every other directory | "The only marketplace that verifies security" |
+| **Bad actors** | Malicious skills sit undetected | Auto-flagged before users see them |
+| **Liability** | You listed it, user got hacked | You warned them (or blocked it) |
+| **Content** | Just another skill list | Security reports = valuable, unique content |
+| **PR story** | Nothing to announce | "We scanned 10,000 skills — here's what we found" |
+
+### What It Costs You
+
+**Nothing.**
+
+- 🆓 MIT licensed — free forever, no API keys, no usage limits
+- 🔒 100% offline — scans run on YOUR server, zero data leaves your infra
+- ⚡ Fast — ~200ms per skill, 10,000 skills in ~17 minutes (4 parallel workers)
+- 📦 One dependency — `npx @elliotllliu/agent-shield scan <target> --format json`
 
 ### What Your Users See
 
-**Skill card:**
+**On the skill card:**
 ```
 📦 awesome-filesystem-tool          ⭐ 342
    by someauthor
 
-   🛡️ 92/100 🟢 Verified Safe
+   🛡️ 92/100 🟢 Verified Safe        ← one glance, instant trust signal
 ```
 
-**Detail page:**
+**On the detail page:**
 ```
 Security Report  ·  Powered by AgentShield
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Score: 92/100 🟢 Low Risk
-12 files · 1,847 lines · scanned Mar 13
+12 files · 1,847 lines · scanned Mar 13, 2026
 
-✅ No backdoors    ✅ No data exfiltration
-✅ No injections   ⚠️ 1 warning: env variable access
+✅ No backdoors       ✅ No data exfiltration
+✅ No prompt injection ⚠️ 1 low: env variable access without validation
 ```
 
-### How to Integrate
+Users can see exactly what was found, in which file, at which line. Full transparency.
 
-One command scans a skill and returns structured JSON:
+### How to Integrate (5 minutes)
+
+One command, structured JSON output:
 
 ```bash
-npx -y @elliotllliu/agent-shield scan ./skill --json
+npx @elliotllliu/agent-shield scan ./skill --format json
 ```
 
-Returns:
 ```json
 {
   "score": 92,
-  "riskLevel": "low",
-  "filesScanned": 12,
-  "findings": [ ... ]
+  "totalFindings": 1,
+  "summary": { "high": 0, "medium": 0, "low": 1 },
+  "findings": [
+    {
+      "severity": "low",
+      "rule": "env-leak",
+      "file": "src/config.ts",
+      "line": 8,
+      "message": "Environment variable access without validation",
+      "evidence": "process.env.SECRET_KEY"
+    }
+  ],
+  "scannedFiles": 12,
+  "scannedLines": 1847
 }
 ```
 
-**Full integration guide with code examples (Node.js, Python, batch scripts), JSON schema, database schema, and edge cases:**
+Store the JSON, render the badge. That's it.
+
+**Full integration guide** with Node.js/Python code templates, React components, database schema, error handling, and AI-readable specification:
 
 📖 **[docs/integration-guide.md](docs/integration-guide.md)**
 
-> Send this link to your dev team or AI agent — it has everything needed to build the integration.
+> Send this link to your dev team or AI coding agent — it has everything needed to build the integration end-to-end.
 
 ### Who Should Integrate
 
-- **Skill directories** (like ClawHub, skills.sh, Agent Skills Hub)
-- **MCP server registries** (like mcp.so, Smithery, Glama)
-- **Plugin marketplaces** (like Dify plugin store)
-- **AI agent platforms** (like OpenClaw, Cline, Cursor)
-- **Enterprise tool registries** (internal skill/tool catalogs)
+| Platform Type | Examples | Integration Value |
+|--------------|---------|-------------------|
+| **Skill directories** | ClawHub, skills.sh | Security badges on every skill |
+| **MCP registries** | mcp.so, Smithery, Glama | Scan MCP servers before listing |
+| **Plugin marketplaces** | Dify store, GPT store | Gate submissions by security score |
+| **Agent platforms** | OpenClaw, Cline, Cursor | Warn users before install |
+| **Enterprise registries** | Internal tool catalogs | Compliance + audit trail |
+
+**Already integrated by platforms scanning 500+ skills.** Join them.
 
 ---
 
