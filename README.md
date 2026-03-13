@@ -346,6 +346,83 @@ False-positive-flagged findings are excluded from scoring.
 | 40-69 | 🟠 High Risk — investigate before using |
 | 0-39 | 🔴 Critical — do not install |
 
+## 🔌 Integrate AgentShield Into Your Platform
+
+**Running a skill directory, MCP marketplace, or plugin registry?** Add AgentShield scanning and give your users something no other platform offers: **verified security scores for every listing.**
+
+### Why Integrate
+
+In 2026, Snyk scanned a major agent skills registry and found **36% of skills contained security flaws** — 1,467 malicious payloads across one platform. Your users are installing these tools into AI agents that have access to files, credentials, and APIs. A single malicious skill can steal everything.
+
+**No skill directory currently verifies what it lists.** Be the first.
+
+### What Your Platform Gets
+
+| Benefit | Detail |
+|---------|--------|
+| 🏆 **Trust differentiation** | You become the only directory where users can verify before they install |
+| 🛡️ **Security badges** | Every skill gets a 🟢🟡🟠🔴 score — users see risk at a glance |
+| 🔍 **Smart filtering** | Users filter by security level, sort by score, hide risky skills |
+| 📊 **Launch story** | "We scanned 19,000 skills — here's what we found" — instant PR |
+| 🆓 **Zero cost** | MIT licensed, runs on your server, no API fees |
+| 🔒 **Zero data sharing** | 100% offline — nothing leaves your infrastructure |
+| ⚡ **Fast** | ~200ms per skill. 10,000 skills in ~17 minutes (4 parallel) |
+
+### What Your Users See
+
+**Skill card:**
+```
+📦 awesome-filesystem-tool          ⭐ 342
+   by someauthor
+
+   🛡️ 92/100 🟢 Verified Safe
+```
+
+**Detail page:**
+```
+Security Report  ·  Powered by AgentShield
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Score: 92/100 🟢 Low Risk
+12 files · 1,847 lines · scanned Mar 13
+
+✅ No backdoors    ✅ No data exfiltration
+✅ No injections   ⚠️ 1 warning: env variable access
+```
+
+### How to Integrate
+
+One command scans a skill and returns structured JSON:
+
+```bash
+npx -y @elliotllliu/agent-shield scan ./skill --json
+```
+
+Returns:
+```json
+{
+  "score": 92,
+  "riskLevel": "low",
+  "filesScanned": 12,
+  "findings": [ ... ]
+}
+```
+
+**Full integration guide with code examples (Node.js, Python, batch scripts), JSON schema, database schema, and edge cases:**
+
+📖 **[docs/integration-guide.md](docs/integration-guide.md)**
+
+> Send this link to your dev team or AI agent — it has everything needed to build the integration.
+
+### Who Should Integrate
+
+- **Skill directories** (like ClawHub, skills.sh, Agent Skills Hub)
+- **MCP server registries** (like mcp.so, Smithery, Glama)
+- **Plugin marketplaces** (like Dify plugin store)
+- **AI agent platforms** (like OpenClaw, Cline, Cursor)
+- **Enterprise tool registries** (internal skill/tool catalogs)
+
+---
+
 ## Comparison: AgentShield vs Snyk Agent Scan
 
 | Feature | AgentShield | Snyk Agent Scan |
@@ -417,6 +494,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add new rules.
 
 - 📦 [npm](https://www.npmjs.com/package/@elliotllliu/agent-shield)
 - 📖 [Rule Documentation](docs/rules.md)
+- 🔌 [Integration Guide](docs/integration-guide.md) — Add AgentShield to your platform
 - 🇨🇳 [中文 README](README.zh-CN.md)
 
 ## License
