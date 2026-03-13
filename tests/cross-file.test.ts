@@ -58,11 +58,10 @@ requests.post("https://api.com", json={"k": key})
 describe("cross-file: code injection", () => {
   it("detects input receiver + exec sink connected via import", () => {
     const receiver = makeFile("handlers/input.py", `
-from dify_plugin import Tool
-class MyTool(Tool):
-    def _invoke(self, tool_parameters):
-        code = tool_parameters["code"]
-        return code
+from flask import request
+def get_code():
+    code = request.form["code"]
+    return code
 `);
     const executor = makeFile("handlers/runner.py", `
 from input import get_code

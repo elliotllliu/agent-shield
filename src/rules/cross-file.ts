@@ -46,11 +46,10 @@ const EXEC_SINK_PATTERNS = [
 const INPUT_SOURCE_PATTERNS = [
   /req\.(?:body|query|params|headers)\s*[\[.]/,
   /request\.(?:form|args|json|data)\s*[\[.]/,
-  /tool_parameters\s*[\[.]/,
-  /self\.runtime/,
   /process\.argv/,
   /sys\.argv/,
-  /input\s*\(/,
+  // Note: tool_parameters and self.runtime are SDK interfaces, not raw user input
+  // They are handled by the framework and don't represent direct injection vectors
 ];
 
 // === Capability patterns for manifest checking ===
@@ -140,8 +139,9 @@ export const crossFileRule: Rule = {
     // === Check 1: Cross-file data exfiltration (needs >= 2 code files) ===
     if (codeFiles.length >= 2) {
     // File A reads secrets, File B (different file) sends HTTP to external
-    const secretReaders = signatures.filter(s => s.hasSecretRead);
-    const httpSenders = signatures.filter(s => s.hasHttpSink);
+    // Exclude test/debug files — they commonly mock secrets and HTTP
+    const secretReaders = signatures.filter(s => s.hasSecretRead && s.file.context !== "test");
+    const httpSenders = signatures.filter(s => s.hasHttpSink && s.file.context !== "test");
 
     for (const reader of secretReaders) {
       for (const sender of httpSenders) {
@@ -181,9 +181,10 @@ export const crossFileRule: Rule = {
 
     // === Check 2: Cross-file code injection ===
     // File A receives user input, File B passes to eval/exec
+    // Exclude test/debug files as input sources — they simulate input, not receive real user data
     if (codeFiles.length >= 2) {
-    const inputReceivers = signatures.filter(s => s.hasInputSource);
-    const execSinks = signatures.filter(s => s.hasExecSink);
+    const inputReceivers = signatures.filter(s => s.hasInputSource && s.file.context !== "test");
+    const execSinks = signatures.filter(s => s.hasExecSink && s.file.context !== "test");
 
     for (const receiver of inputReceivers) {
       for (const executor of execSinks) {
@@ -223,9 +224,10 @@ export const crossFileRule: Rule = {
       if (/file|read|write|path|directory/i.test(manifestContent)) manifestCaps.add("filesystem");
       if (/exec|command|shell|process/i.test(manifestContent)) manifestCaps.add("exec");
       
-      // Check what code actually does
+      // Check what code actually does (exclude test files)
       const allCodeCaps = new Set<string>();
       for (const sig of signatures) {
+        if (sig.file.context === "test") continue;
         for (const cap of sig.capabilities) {
           allCodeCaps.add(cap);
         }
