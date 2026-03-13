@@ -30,6 +30,8 @@ const BACKDOOR_PATTERNS: Array<{
   { pattern: /\$\(curl\s/, desc: "command substitution with curl", severity: "critical" },
   { pattern: /\beval\s+\$/, desc: "shell eval with variable", severity: "critical" },
   { pattern: /bash\s+-c\s+\$/, desc: "bash -c with variable", severity: "critical" },
+  { pattern: /(?:curl|wget)\s+[^|]*\|\s*(?:bash|sh|zsh|python|node|perl)/, desc: "pipe-to-shell: downloads and executes remote code", severity: "critical" },
+  { pattern: /(?:curl|wget)\s+.*-o\s+\S+\s*&&\s*chmod\s+\+x/, desc: "download, chmod +x, execute pattern", severity: "critical" },
 ];
 
 export const backdoorRule: Rule = {
