@@ -1,4 +1,4 @@
-# AgentShield Phase 4 — 开发 Checklist
+# Agent Shield Phase 4 — 开发 Checklist
 
 **目标：** 检测能力超越 snyk/agent-scan
 **总预估：** ~8 小时
@@ -100,7 +100,7 @@
 
 ## 完成后 vs snyk/agent-scan 对比
 
-| 能力 | snyk | AgentShield |
+| 能力 | snyk | Agent Shield |
 |------|------|-------------|
 | Prompt Injection (regex) | ❌ 无 | ✅ 25+ 模式 |
 | Prompt Injection (LLM) | ✅ 黑盒 | ✅ 用户选模型 |

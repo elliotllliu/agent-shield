@@ -1,4 +1,4 @@
-# AgentShield Benchmark Results
+# Agent Shield Benchmark Results
 
 Generated: 2026-03-13T06:29:11.074Z
 Duration: 778ms

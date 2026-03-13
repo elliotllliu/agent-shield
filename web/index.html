@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AgentShield — AI Agent Security Scanner</title>
+  <title>Agent Shield — AI Agent Security Scanner</title>
   <meta name="description" content="Scan AI agent skills, MCP servers, and plugins for security vulnerabilities. Free online scanner.">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -146,7 +146,7 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>🛡️ <span>AgentShield</span></h1>
+      <h1>🛡️ <span>Agent Shield</span></h1>
       <p>Security scanner for AI agent skills, MCP servers & plugins</p>
       <p class="stat">30 rules • AST taint tracking • Cross-file analysis • Kill chain detection</p>
       <p style="color:#8b949e;font-size:0.85rem;margin-top:0.5rem;">Free &amp; open source · 100% offline · Zero config · <code style="background:#161b22;padding:0.15rem 0.4rem;border-radius:4px;">npx @elliotllliu/agentshield scan</code></p>
@@ -345,7 +345,7 @@
       const ghMatch = url.match(/github\.com\/([^/]+\/[^/]+)/);
       if (ghMatch) {
         const color = score >= 90 ? '4c1' : score >= 70 ? 'dfb317' : score >= 40 ? 'fe7d37' : 'e05d44';
-        const badge = `[![AgentShield ${score}/100](https://img.shields.io/badge/AgentShield-${score}%2F100-${color})](https://github.com/elliotllliu/agentshield)`;
+        const badge = `[![Agent Shield ${score}/100](https://img.shields.io/badge/Agent Shield-${score}%2F100-${color})](https://github.com/elliotllliu/agentshield)`;
         document.getElementById('badge-text').textContent = badge;
       }
 

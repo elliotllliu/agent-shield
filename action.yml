@@ -1,4 +1,4 @@
-name: 'AgentShield Security Scan'
+name: 'Agent Shield Security Scan'
 description: 'Scan AI agent skills, MCP servers, and plugins for security vulnerabilities'
 author: 'Elliot Liu'
 
@@ -36,7 +36,7 @@ runs:
       with:
         node-version: '20'
 
-    - name: Run AgentShield scan
+    - name: Run Agent Shield scan
       id: scan
       shell: bash
       run: |

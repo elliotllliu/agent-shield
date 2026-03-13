@@ -1,4 +1,4 @@
-# AgentShield 竞品调研与研究方向
+# Agent Shield 竞品调研与研究方向
 
 > 调研时间: 2026-03-12
 > 来源: GitHub, YouTube, 技术博客
@@ -29,9 +29,9 @@
 | alexandriashai/mcp-guardian | 3 | prompt injection in tool descriptions |
 | Helixar-AI/sentinel | 4 | MCP scanner |
 
-### AgentShield vs snyk/agent-scan 对比
+### Agent Shield vs snyk/agent-scan 对比
 
-| 维度 | AgentShield | snyk/agent-scan |
+| 维度 | Agent Shield | snyk/agent-scan |
 |------|-------------|-----------------|
 | 语言 | TypeScript/Node.js | Python |
 | 安装 | `npx` 零安装 | 需 `uv` + Snyk token |
@@ -63,7 +63,7 @@
 - Snyk 通过收购 Invariant Labs 押注这个方向
 - 当前缺乏：标准化的权限声明、运行时沙箱、审计追踪
 
-## 三、AgentShield 差距与研究方向
+## 三、Agent Shield 差距与研究方向
 
 ### 🔴 必做（与 snyk/agent-scan 的关键差距）
 

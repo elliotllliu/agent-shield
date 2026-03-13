@@ -1,4 +1,4 @@
-# 🛡️ AgentShield
+# 🛡️ Agent Shield
 
 **The open-source security scanner for AI agent skills, MCP servers, and plugins.**
 
@@ -12,9 +12,9 @@ Catch data exfiltration, backdoors, prompt injection, tool poisoning, and supply
 
 **Offline-first. AST-powered. Open source. Your data never leaves your machine.**
 
-> 🆚 **vs Snyk Agent Scan:** AgentShield has **30 rules** (vs Snyk's 6 issue codes), runs 100% locally, and provides capabilities Snyk can't: cross-file analysis, kill chain detection, taint tracking, and multi-language injection detection.
+> 🆚 **vs Snyk Agent Scan:** Agent Shield has **30 rules** (vs Snyk's 6 issue codes), runs 100% locally, and provides capabilities Snyk can't: cross-file analysis, kill chain detection, taint tracking, and multi-language injection detection.
 
-## Why AgentShield?
+## Why Agent Shield?
 
 AI agents install and execute third-party skills, MCP servers, and plugins with minimal security review. A single malicious component can:
 
@@ -25,7 +25,7 @@ AI agents install and execute third-party skills, MCP servers, and plugins with 
 - 🎭 **Shadow tools** — override legitimate tools with malicious versions
 - ⛓️ **Chain attacks** — combine reconnaissance → access → exfiltration in multi-step kill chains
 
-AgentShield catches these patterns with **30 security rules**, **Python AST taint tracking**, and **cross-file correlation analysis**.
+Agent Shield catches these patterns with **30 security rules**, **Python AST taint tracking**, and **cross-file correlation analysis**.
 
 ## Quick Start
 
@@ -85,7 +85,7 @@ npx @elliotllliu/agent-shield scan ./skill/ --json --fail-under 70
 | `typosquatting` | Suspicious npm names: `1odash` → `lodash` |
 | `hidden-files` | `.env` files with secrets committed to repo |
 
-### 🆕 Advanced Detection (unique to AgentShield)
+### 🆕 Advanced Detection (unique to Agent Shield)
 
 | Rule | Detects | Snyk? |
 |------|---------|-------|
@@ -100,7 +100,7 @@ npx @elliotllliu/agent-shield scan ./skill/ --json --fail-under 70
 
 ### Cross-File Correlation Analysis
 
-Unlike single-file scanners, AgentShield analyzes data flow across your entire codebase:
+Unlike single-file scanners, Agent Shield analyzes data flow across your entire codebase:
 
 ```
 🔴 Cross-file data flow:
@@ -187,7 +187,7 @@ We scanned the entire [langgenius/dify-plugins](https://github.com/langgenius/di
 ## Example Output
 
 ```
-🛡️  AgentShield Scan Report
+🛡️  Agent Shield Scan Report
 📁 Scanned: ./deceptive-tool (3 files, 25 lines)
 
 Score: 0/100 (Critical Risk)
@@ -309,9 +309,9 @@ False-positive-flagged findings are excluded from scoring.
 | 40-69 | 🟠 High Risk — investigate before using |
 | 0-39 | 🔴 Critical — do not install |
 
-## Comparison: AgentShield vs Snyk Agent Scan
+## Comparison: Agent Shield vs Snyk Agent Scan
 
-| Feature | AgentShield | Snyk Agent Scan |
+| Feature | Agent Shield | Snyk Agent Scan |
 |---------|------------|-----------------|
 | Security rules | **30** | 6 issue codes |
 | Cross-file analysis | ✅ import graph + data flow | ❌ single file only |

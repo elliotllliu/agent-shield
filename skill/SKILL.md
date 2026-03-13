@@ -9,7 +9,7 @@ description: >
   "安全扫描", "扫一下安不安全".
 ---
 
-# AgentShield — Security Scanner
+# Agent Shield — Security Scanner
 
 Scan any directory for security issues in AI agent skills, MCP servers, and plugins.
 
