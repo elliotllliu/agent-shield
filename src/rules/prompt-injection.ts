@@ -250,7 +250,9 @@ export const promptInjection: Rule = {
         for (const { pattern, description, severity } of INJECTION_PATTERNS) {
           // Skip zero-width/Unicode checks unless it's a skill definition file
           // Editor artifacts (BOM, ZWNJ, ZWS) are common in multilingual markdown/code
-          if (!isSkillMd && (description.includes("Zero-width") || description.includes("Unicode formatting"))) continue;
+          // Zero-width chars: check in .md and .py files (skill definitions, tool descriptions)
+          // Skip in .json/.yaml config files where ZWNJ (U+200C) is common editor artifact
+          if (!isSkillMd && !isMarkdown && !isPython && (description.includes("Zero-width") || description.includes("Unicode formatting"))) continue;
           
           pattern.lastIndex = 0;
           if (pattern.test(line)) {

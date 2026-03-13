@@ -1,23 +1,23 @@
 # AgentShield Benchmark Results
 
-Generated: 2026-03-13T09:11:17.207Z
-Duration: 804ms
+Generated: 2026-03-13T10:39:27.828Z
+Duration: 885ms
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
-| Malicious samples | 52 |
-| Benign samples | 61 |
-| True Positives | 50/52 |
-| False Negatives | 2 |
-| True Negatives | 61/61 |
+| Malicious samples | 56 |
+| Benign samples | 64 |
+| True Positives | 56/56 |
+| False Negatives | 0 |
+| True Negatives | 64/64 |
 | False Positives | 0 |
-| **Recall** | **96.2%** |
+| **Recall** | **100.0%** |
 | **Precision** | **100.0%** |
-| **F1 Score** | **98.0%** |
+| **F1 Score** | **100.0%** |
 | **FPR** | **0.0%** |
-| **Accuracy** | **98.2%** |
+| **Accuracy** | **100.0%** |
 
 ## Malicious Samples
 
@@ -54,10 +54,11 @@ Duration: 804ms
 | malicious/23-sensitive-read.py | ✅ | 0 | 0 | 0 | sensitive-read, skill-risks |
 | malicious/24-privilege-escalation.sh | ✅ | 1 | 0 | 0 | backdoor, sensitive-read, skill-risks |
 | malicious/31-multilang-injection.md | ✅ | 0 | 4 | 0 | multilang-injection, prompt-injection |
+| malicious/32-implicit-tool-poisoning.yaml | ✅ | 0 | 5 | 0 | prompt-injection, multilang-injection |
 | malicious/33-memory-poisoning.md | ✅ | 0 | 3 | 0 | multilang-injection, prompt-injection |
 | malicious/35-full-kill-chain.py | ✅ | 6 | 2 | 0 | data-exfil, cross-file, attack-chain, env-leak, sensitive-read |
 | malicious/36-sql-injection.py | ✅ | 1 | 1 | 0 | ast-sql-injection, python-security |
-| malicious/37-ssti-template.py | ❌ | 0 | 0 | 100 |  |
+| malicious/37-ssti-template.py | ✅ | 0 | 2 | 0 | python-security |
 | malicious/38-pickle-deser.py | ✅ | 2 | 2 | 0 | ast-deserialization, python-security |
 | malicious/39-eval-input.py | ✅ | 2 | 8 | 0 | backdoor, python-security, ast-code-exec, ast-dynamic-import |
 | malicious/40-description-exfil.md | ✅ | 0 | 0 | 0 | sensitive-read, prompt-injection, skill-risks |
@@ -69,12 +70,15 @@ Duration: 804ms
 | malicious/46-mcp-path-traversal.md | ✅ | 0 | 0 | 0 | prompt-injection |
 | malicious/47-postinstall-backdoor.js | ✅ | 1 | 1 | 0 | backdoor, skill-risks |
 | malicious/48-spanish-injection.md | ✅ | 0 | 0 | 0 | sensitive-read, prompt-injection |
-| malicious/49-zero-width-hidden.md | ❌ | 0 | 0 | 100 |  |
+| malicious/49-zero-width-hidden.md | ✅ | 0 | 0 | 0 | prompt-injection |
 | malicious/50-ssh-key-exfil.py | ✅ | 1 | 0 | 0 | cross-file |
 | malicious/51-remote-code-exec.js | ✅ | 0 | 1 | 0 | backdoor |
+| malicious/52-tool-desc-injection.yaml | ✅ | 0 | 3 | 0 | prompt-injection, description-integrity |
 | malicious/53-hidden-miner.py | ✅ | 0 | 1 | 0 | crypto-mining |
 | malicious/54-persistence-cron.sh | ✅ | 1 | 0 | 0 | backdoor, sensitive-read, skill-risks |
 | malicious/55-env-dump-exfil.py | ✅ | 1 | 0 | 0 | cross-file |
+| malicious/56-go-injection.go | ✅ | 0 | 2 | 0 | go-rust-security |
+| malicious/57-rust-injection.rs | ✅ | 0 | 2 | 0 | go-rust-security |
 
 ## Benign Samples
 
@@ -104,6 +108,7 @@ Duration: 804ms
 | benign/19-base64-codec.py | ✅ | 0 | 0 | 42 |
 | benign/20-subprocess-tool.py | ✅ | 0 | 2 | 42 |
 | benign/21-multilang-readme.md | ✅ | 0 | 0 | 42 |
+| benign/22-normal-tool.yaml | ✅ | 0 | 0 | 42 |
 | benign/23-csv-parser.py | ✅ | 0 | 0 | 42 |
 | benign/24-string-utils.js | ✅ | 0 | 0 | 42 |
 | benign/25-git-branch-clean.sh | ✅ | 0 | 0 | 42 |
@@ -141,3 +146,5 @@ Duration: 804ms
 | benign/50-commit-helper.md | ✅ | 0 | 0 | 42 |
 | benign/50-cron-parser.md | ✅ | 0 | 0 | 42 |
 | benign/51-levenshtein.js | ✅ | 0 | 0 | 42 |
+| benign/52-go-server.go | ✅ | 0 | 0 | 42 |
+| benign/53-rust-utils.rs | ✅ | 0 | 0 | 42 |

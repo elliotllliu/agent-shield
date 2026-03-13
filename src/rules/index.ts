@@ -26,6 +26,7 @@ import { multilangInjectionRule } from "./multilang-injection.js";
 import { descriptionIntegrityRule } from "./description-integrity.js";
 import { pythonAstRule } from "./python-ast.js";
 import { mcpRuntimeRule } from "./mcp-runtime.js";
+import { goRustSecurityRule } from "./go-rust-security.js";
 
 /** All registered rules */
 export const rules: Rule[] = [
@@ -68,6 +69,8 @@ export const rules: Rule[] = [
   pythonAstRule,
   // MCP runtime security
   mcpRuntimeRule,
+  // Go/Rust security
+  goRustSecurityRule,
 ];
 
 /** Get a rule by ID */

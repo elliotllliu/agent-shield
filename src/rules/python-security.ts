@@ -57,7 +57,8 @@ const PYTHON_PATTERNS: Array<{ pattern: RegExp; desc: string; severity: "high" |
   { pattern: /\brandom\b(?!\.SystemRandom).*(?:password|secret|token|key|salt)/im, desc: "random module for security-sensitive value (use secrets module)", severity: "medium", category: "weak-crypto" },
   
   // === MEDIUM RISK: Dangerous patterns ===
-  { pattern: /\btemplate\s*=\s*(?:Template|Environment).*\brender\s*\(.*(?:request|input|user)/m, desc: "Server-side template injection (SSTI) risk", severity: "high", category: "ssti" },
+  { pattern: /\bTemplate\s*\(\s*(?:user|input|request|data|query|param|args|body|payload|content|text|msg|message|template_str|user_input)/m, desc: "Server-side template injection (SSTI) — user input in Template()", severity: "high", category: "ssti" },
+  { pattern: /\bTemplate\s*\(\s*["'].*['"]\s*\+\s*\w+/m, desc: "Server-side template injection (SSTI) — string concat in Template()", severity: "medium", category: "ssti" },
   { pattern: /\bMarkup\s*\(\s*f["']/m, desc: "Jinja2 Markup with f-string — XSS risk", severity: "medium", category: "xss" },
   { pattern: /\bHTMLParser\s*\(/m, desc: "HTMLParser — ensure proper sanitization", severity: "low", category: "xss" },
   

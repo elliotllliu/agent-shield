@@ -32,7 +32,7 @@ function runBenchmark() {
   // Scan malicious directory as a whole
   console.log("🔴 Scanning malicious samples...\n");
   const maliciousResult = scan(MALICIOUS_DIR);
-  const maliciousFiles = readdirSync(MALICIOUS_DIR).filter(f => f.endsWith(".md") || f.endsWith(".json") || f.endsWith(".py") || f.endsWith(".sh") || f.endsWith(".ts") || f.endsWith(".js") || f.endsWith(".yaml") || f.endsWith(".yml"));
+  const maliciousFiles = readdirSync(MALICIOUS_DIR).filter(f => f.endsWith(".md") || f.endsWith(".json") || f.endsWith(".py") || f.endsWith(".sh") || f.endsWith(".ts") || f.endsWith(".js") || f.endsWith(".yaml") || f.endsWith(".yml") || f.endsWith(".go") || f.endsWith(".rs"));
 
   for (const file of maliciousFiles) {
     const fileFindings = maliciousResult.findings.filter(f => f.file.includes(file));
@@ -64,7 +64,7 @@ function runBenchmark() {
   // Scan benign directory as a whole
   console.log("\n🟢 Scanning benign samples...\n");
   const benignResult = scan(BENIGN_DIR);
-  const benignFiles = readdirSync(BENIGN_DIR).filter(f => f.endsWith(".md") || f.endsWith(".json") || f.endsWith(".py") || f.endsWith(".sh") || f.endsWith(".ts") || f.endsWith(".js") || f.endsWith(".yaml") || f.endsWith(".yml"));
+  const benignFiles = readdirSync(BENIGN_DIR).filter(f => f.endsWith(".md") || f.endsWith(".json") || f.endsWith(".py") || f.endsWith(".sh") || f.endsWith(".ts") || f.endsWith(".js") || f.endsWith(".yaml") || f.endsWith(".yml") || f.endsWith(".go") || f.endsWith(".rs"));
 
   for (const file of benignFiles) {
     const fileFindings = benignResult.findings.filter(f => f.file.includes(file));

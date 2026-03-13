@@ -13,6 +13,7 @@ const SKIP_DIRS = new Set([
 const CODE_EXTS = new Set([
   ".ts", ".js", ".mjs", ".cjs", ".tsx", ".jsx",
   ".py", ".sh", ".bash", ".zsh",
+  ".go", ".rs",
   ".json", ".yaml", ".yml", ".toml",
   ".md",
 ]);
