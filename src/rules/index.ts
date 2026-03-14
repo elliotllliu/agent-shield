@@ -27,6 +27,7 @@ import { descriptionIntegrityRule } from "./description-integrity.js";
 import { pythonAstRule } from "./python-ast.js";
 import { mcpRuntimeRule } from "./mcp-runtime.js";
 import { goRustSecurityRule } from "./go-rust-security.js";
+import { skillHijackRule } from "./skill-hijack.js";
 
 /** All registered rules */
 export const rules: Rule[] = [
@@ -71,6 +72,8 @@ export const rules: Rule[] = [
   mcpRuntimeRule,
   // Go/Rust security
   goRustSecurityRule,
+  // Skill/plugin behavioral hijacking detection
+  skillHijackRule,
 ];
 
 /** Get a rule by ID */

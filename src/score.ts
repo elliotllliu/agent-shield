@@ -43,6 +43,7 @@ const RULE_WEIGHTS: Record<string, number> = {
   "phone-home": 1.0,
   "mcp-manifest": 1.0,
   "skill-risks": 1.0,
+  "skill-hijack": 2.0, // Behavioral hijacking is serious
 
   // Low severity — base -3 (new base penalty)
   "credential-hardcode": 1.0,
@@ -84,7 +85,7 @@ const DIMENSION_RULES: Record<string, Set<string>> = {
   ]),
   promptInjection: new Set([
     "prompt-injection", "prompt-injection-llm", "multilang-injection",
-    "tool-shadowing", "description-integrity", "skill-risks",
+    "tool-shadowing", "description-integrity", "skill-risks", "skill-hijack",
   ]),
   codeQuality: new Set([
     "excessive-perms", "mcp-manifest",
