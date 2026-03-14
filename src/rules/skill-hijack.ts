@@ -275,7 +275,20 @@ export const skillHijackRule: Rule = {
             /^\s*return\s+["'`]/.test(trimmed) ||
             /\w(?:[Tt]ext|[Mm]sg|[Mm]essage|[Dd]escription|[Ll]abel|[Tt]itle|[Hh]int|[Hh]elp|[Uu]sage|[Dd]octor|[Rr]epair|[Ff]ix|[Ss]uggest|[Tt]ip|[Ee]xample)\s*[:=]\s*["'`]/.test(trimmed) ||
             /^\s*["'`\\]/.test(trimmed);
-          if (isHelpContext) continue;
+
+          // Also check if we're inside a multi-line template literal or string
+          // (previous lines have unclosed backtick/quote)
+          if (!isHelpContext) {
+            let insideTemplateLiteral = false;
+            for (let j = Math.max(0, i - 10); j < i; j++) {
+              const prev = file.lines[j]!;
+              const backtickCount = (prev.match(/`/g) || []).length;
+              if (backtickCount % 2 === 1) insideTemplateLiteral = !insideTemplateLiteral;
+            }
+            if (insideTemplateLiteral) continue;
+          } else {
+            continue;
+          }
 
           for (const { pattern, description, severity } of CONFIG_TAMPER) {
             if (pattern.test(line)) {
