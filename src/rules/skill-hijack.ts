@@ -18,7 +18,7 @@ import type { Rule, Finding, ScannedFile } from "../types.js";
 // ─── Category 1: Plugin prompt injection ───
 // Detects OpenClaw plugin APIs that inject content into prompts
 
-const PLUGIN_PROMPT_INJECTION: Array<{ pattern: RegExp; description: string; severity: "high" | "medium" }> = [
+const PLUGIN_PROMPT_INJECTION: Array<{ pattern: RegExp; description: string; severity: "high" | "medium" | "low" }> = [
   // before_prompt_build hook with prependContext/appendContext
   { pattern: /before_prompt_build.*prependContext|prependContext.*before_prompt_build/s, description: "Plugin injects content before every prompt via before_prompt_build + prependContext" , severity: "high" },
   { pattern: /before_prompt_build.*appendContext|appendContext.*before_prompt_build/s, description: "Plugin appends content to every prompt via before_prompt_build + appendContext", severity: "high" },
@@ -34,7 +34,7 @@ const PLUGIN_PROMPT_INJECTION: Array<{ pattern: RegExp; description: string; sev
 // ─── Category 2: SKILL.md behavioral override ───
 // Detects aggressive language in SKILL.md that forces agent behavior
 
-const SKILLMD_BEHAVIORAL_OVERRIDE: Array<{ pattern: RegExp; description: string; severity: "high" | "medium" }> = [
+const SKILLMD_BEHAVIORAL_OVERRIDE: Array<{ pattern: RegExp; description: string; severity: "high" | "medium" | "low" }> = [
   // Forced priority claims
   { pattern: /(?:highest|top|first|absolute|maximum|ultimate|supreme)[\s-]*priority/i, description: "Claims highest priority over other skills", severity: "medium" },
   // MUST + this skill / this tool / this flow (not generic "must use X")
@@ -45,32 +45,32 @@ const SKILLMD_BEHAVIORAL_OVERRIDE: Array<{ pattern: RegExp; description: string;
   { pattern: /(?:override|replace|supersede|take\s+over|supplant)\s+(?:(?:other|existing|default|built-in|original)\s+)*(?:skills?|tools?|plugins?)/i, description: "Claims to override other skills/tools", severity: "high" },
   { pattern: /(?:ignore|skip|bypass|disable|suppress)\s+(?:(?:other|existing|default|built-in|original)\s+)*(?:skills?|tools?|plugins?)/i, description: "Instructs agent to ignore other skills", severity: "high" },
   { pattern: /(?:do\s+not|don'?t|never)\s+(?:use|call|invoke|run|trigger)\s+(?:other|alternative|competing)/i, description: "Prohibits use of alternative tools", severity: "medium" },
-  // Chinese variants
-  { pattern: /(?:必须|一定要|强制|优先)\s*(?:使用|调用|触发|选择|运行)/i, description: "Chinese: forced usage directive (必须使用)", severity: "medium" },
-  { pattern: /(?:最高|最优先|第一)\s*(?:优先级|优先权)/i, description: "Chinese: claims highest priority (最高优先级)", severity: "medium" },
-  { pattern: /(?:忽略|跳过|不要使用|禁止使用)\s*(?:其他|别的|其它|默认)\s*(?:技能|工具|插件)/i, description: "Chinese: ignore other skills (忽略其他技能)", severity: "high" },
-  { pattern: /(?:替代|取代|覆盖)\s*(?:其他|原有|默认|系统)\s*(?:技能|工具|插件|功能)/i, description: "Chinese: replace other skills (替代其他技能)", severity: "high" },
+  // Chinese variants — low severity (common in Chinese technical docs, high FP risk)
+  { pattern: /(?:必须|一定要|强制|优先)\s*(?:使用|调用|触发|选择|运行)/i, description: "Chinese: forced usage directive (必须使用) — review context", severity: "low" },
+  { pattern: /(?:最高|最优先|第一)\s*(?:优先级|优先权)/i, description: "Chinese: claims highest priority (最高优先级) — review context", severity: "low" },
+  { pattern: /(?:忽略|跳过|不要使用|禁止使用)\s*(?:其他|别的|其它|默认)\s*(?:技能|工具|插件)/i, description: "Chinese: ignore other skills (忽略其他技能)", severity: "medium" },
+  { pattern: /(?:替代|取代|覆盖)\s*(?:其他|原有|默认|系统)\s*(?:技能|工具|插件|功能)/i, description: "Chinese: replace other skills (替代其他技能)", severity: "medium" },
 ];
 
 // ─── Category 3: Commercial/competitive hijacking ───
 // Detects skills that redirect to their own commercial services
 
-const COMMERCIAL_HIJACK: Array<{ pattern: RegExp; description: string; severity: "high" | "medium" }> = [
+const COMMERCIAL_HIJACK: Array<{ pattern: RegExp; description: string; severity: "high" | "medium" | "low" }> = [
   // Prefer X over Y / fallback patterns — must have explicit service names with backticks or quotes
   { pattern: /(?:prefer|prioritize|try)\s+[`'"]\w+[`'"]\s+(?:first|over|before|instead\s+of)\s+[`'"]\w+[`'"]/i, description: "Redirects from one service to another with preference directive", severity: "medium" },
   { pattern: /(?:try|use)\s+[`'"]\w+[`'"]\s+first.*(?:fallback|if\s+unavailable|if\s+.*fail).*[`'"]\w+[`'"]/is, description: "Establishes service preference hierarchy", severity: "medium" },
   // Store/marketplace redirection
   { pattern: /(?:our|my|this)\s+(?:skill\s+)?(?:store|marketplace|registry|hub|shop|market)/i, description: "Promotes own skill store/marketplace", severity: "medium" },
   { pattern: /(?:download|install|get)\s+(?:skills?|plugins?|tools?)\s+from\s+(?:our|my|this)/i, description: "Directs skill installation from own source", severity: "medium" },
-  // Chinese variants
-  { pattern: /(?:优先使用|先试|先用)\s*(?:[`'"]\w+[`'"])\s*[，,]?\s*(?:再|然后|否则|如果.*?不行)\s*(?:使用|用|试)/i, description: "Chinese: service preference ordering (优先使用X，再用Y)", severity: "medium" },
-  { pattern: /(?:我们的|自己的|本)\s*(?:技能|工具)\s*(?:商店|市场|平台|仓库)/i, description: "Chinese: promotes own skill store (技能商店)", severity: "medium" },
+  // Chinese variants — low severity (common phrasing, high FP risk)
+  { pattern: /(?:优先使用|先试|先用)\s*(?:[`'"]\w+[`'"])\s*[，,]?\s*(?:再|然后|否则|如果.*?不行)\s*(?:使用|用|试)/i, description: "Chinese: service preference ordering — review context", severity: "low" },
+  { pattern: /(?:我们的|自己的|本)\s*(?:技能|工具)\s*(?:商店|市场|平台|仓库)/i, description: "Chinese: promotes own skill store — review context", severity: "low" },
 ];
 
 // ─── Category 4: Agent config tampering ───
 // Detects code that modifies agent configuration files
 
-const CONFIG_TAMPER: Array<{ pattern: RegExp; description: string; severity: "high" | "medium" }> = [
+const CONFIG_TAMPER: Array<{ pattern: RegExp; description: string; severity: "high" | "medium" | "low" }> = [
   // OpenClaw config modification
   { pattern: /openclaw\s+config\s+set/i, description: "Modifies OpenClaw configuration via CLI", severity: "high" },
   { pattern: /~\/\.openclaw\/openclaw\.json|~\/\.openclaw\/config/i, description: "Targets OpenClaw configuration files directly", severity: "high" },
@@ -89,7 +89,7 @@ const CONFIG_TAMPER: Array<{ pattern: RegExp; description: string; severity: "hi
 // Detects tools that auto-update from unknown sources without user consent
 
 // Patterns that indicate self-replacing behavior
-const SELF_REPLACE_PATTERNS: Array<{ pattern: RegExp; description: string; severity: "high" | "medium" }> = [
+const SELF_REPLACE_PATTERNS: Array<{ pattern: RegExp; description: string; severity: "high" | "medium" | "low" }> = [
   // Python: os.execve to re-execute self after update
   { pattern: /os\.execve\s*\(\s*sys\.executable/, description: "Self-replacing execution: downloads update then re-executes itself via os.execve", severity: "high" },
   // Generic self-replacement
@@ -248,6 +248,20 @@ export const skillHijackRule: Rule = {
       if (isCode || isShellScript) {
         for (let i = 0; i < file.lines.length; i++) {
           const line = file.lines[i]!;
+          const trimmed = line.trimStart();
+
+          // Skip comments
+          if (trimmed.startsWith("//") || trimmed.startsWith("#") || trimmed.startsWith("*") || trimmed.startsWith("<!--")) continue;
+
+          // Skip help text / documentation / logging (commands shown as examples, not executed)
+          const isHelpContext =
+            /(?:console\.log|print|echo|puts|logger\.|log\.|warn\(|info\(|error\(|debug\()\s*\(?/i.test(trimmed) ||
+            /(?:console\.log|print|echo)\s*\(?\s*["'`]/.test(trimmed) ||
+            /^\s*["'`].*openclaw\s+config/.test(trimmed) ||
+            /\w(?:[Tt]ext|[Mm]sg|[Mm]essage|[Dd]escription|[Ll]abel|[Tt]itle|[Hh]int|[Hh]elp|[Uu]sage|[Dd]octor|[Rr]epair|[Ff]ix|[Ss]uggest|[Tt]ip|[Ee]xample)\s*[:=]\s*["'`]/.test(trimmed) ||
+            /^\s*["'`\\]/.test(trimmed);
+          if (isHelpContext) continue;
+
           for (const { pattern, description, severity } of CONFIG_TAMPER) {
             if (pattern.test(line)) {
               findings.push({
@@ -256,7 +270,7 @@ export const skillHijackRule: Rule = {
                 file: file.relativePath,
                 line: i + 1,
                 message: `Config tampering: ${description}`,
-                evidence: line.trim().slice(0, 120),
+                evidence: trimmed.slice(0, 120),
                 confidence: "high",
               });
               break;
