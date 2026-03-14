@@ -104,5 +104,11 @@ agent-shield discover
 
 📦 [npm](https://www.npmjs.com/package/@elliotllliu/agent-shield) · 📖 [Rules](docs/rules.md) · 🇨🇳 [中文](README.md)
 
+## 🌐 Community & Partners
+
+| Partner | Contribution |
+|---------|-------------|
+| [Agent Skills Hub](https://agentskillshub.top) | Real-world testing across skill registries, security insights, and feature feedback |
+
 ## License
 MIT

@@ -450,6 +450,12 @@ We especially welcome:
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
 
+## 🌐 Community & Partners
+
+| Partner | Contribution |
+|---------|-------------|
+| [Agent Skills Hub](https://agentskillshub.top) | Real-world testing across skill registries, security insights, and feature feedback |
+
 ## Links
 
 📦 [npm](https://www.npmjs.com/package/@elliotllliu/agent-shield) · 📖 [Rule Docs](docs/rules.md) · 🤖 [GitHub App](github-app/README.md) · 💻 [VS Code](vscode-extension/README.md) · 🔌 [Integration Guide](docs/integration-guide.md) · 🇨🇳 [中文 README](README.zh-CN.md)
