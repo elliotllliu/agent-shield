@@ -260,6 +260,12 @@ export const promptInjection: Rule = {
           
           pattern.lastIndex = 0;
           if (pattern.test(line)) {
+            // Skip tokenizer tokens (endoftext, im_start, etc.) when used in stop sequences,
+            // OpenAPI specs, or config files — these are legitimate model parameters
+            if (description.includes("ChatML/token delimiter") &&
+                (/["']stop["']\s*[:=]|stop\s*[:=]\s*\[|"stop"|stopSequences|stop_sequences/i.test(line) ||
+                 /\.yaml$|\.yml$|openapi|swagger/i.test(file.relativePath))) continue;
+
             findings.push({
               rule: "prompt-injection",
               severity: isSkillMd ? severity : "medium",

@@ -47,6 +47,9 @@ export const credentialHardcodeRule: Rule = {
 
         for (const { pattern, desc } of CREDENTIAL_PATTERNS) {
           if (pattern.test(line)) {
+            // Skip placeholder / example values
+            if (/["'](?:\*{2,}|x{4,}|X{4,}|<[A-Z_]+>|YOUR[_\s]|REPLACE[_\s]|ADD[_\s]|CHANGE[_\s]|INSERT[_\s]|TODO|FIXME|example|placeholder|dummy|test|fake|mock|sample|changeme)["']/i.test(line)) continue;
+
             // If this line is part of an auth flow, lower confidence
             const conf = (authResult.hasAuthFlow || isAuthFlowLine(line)) ? "low" as const : "medium" as const;
             findings.push({
