@@ -5,7 +5,7 @@
 [![npm](https://img.shields.io/npm/v/@elliotllliu/agent-shield)](https://www.npmjs.com/package/@elliotllliu/agent-shield)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-236%20passing-brightgreen)]()
-[![Rules](https://img.shields.io/badge/rules-31-blue)]()
+[![Rules](https://img.shields.io/badge/rules-28-blue)]()
 
 > Free, offline, zero-config AI Agent security scanner.
 > Quickly check your skills, MCP servers, and plugins for security issues.
@@ -33,6 +33,15 @@ Tracks complete attack paths across multiple files.
 
 ### 3. 🆓 Free & Offline
 No account · no code upload · no API key required · `npx` one-liner.
+
+---
+
+### 🧠 Context-Aware Scoring
+
+- **SDK Awareness**: Auto-detects 25+ SDKs — network calls via known SDKs get lower risk scores
+- **Auth Flow Recognition**: Identifies OAuth2, JWT, session management — legitimate auth isn't flagged as exfiltration
+- **Data Flow Tracking**: Traces variables from source to sink — only flags actual exfiltration paths
+- **Confidence Scoring**: `high/medium/low` confidence multipliers reduce false positive impact
 
 ---
 

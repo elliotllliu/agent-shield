@@ -7,7 +7,7 @@
 [![npm](https://img.shields.io/npm/v/@elliotllliu/agent-shield)](https://www.npmjs.com/package/@elliotllliu/agent-shield)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-236%20passing-brightgreen)]()
-[![Rules](https://img.shields.io/badge/rules-31-blue)]()
+[![Rules](https://img.shields.io/badge/rules-28-blue)]()
 
 Catch data exfiltration, backdoors, prompt injection, tool poisoning, and supply chain attacks **before** they reach your AI agents — and **intercept them at runtime**.
 
@@ -88,10 +88,30 @@ exec(config_var)    # → 🟡 MEDIUM: dynamic, not proven tainted
 
 ---
 
+### 4. 🧠 Context-Aware Scoring (New)
+
+Traditional scanners flag every `fetch()` call as suspicious. Agent Shield understands context:
+
+- **SDK Awareness**: Auto-detects 25+ SDKs (AWS, Feishu, Stripe, OpenAI...) — network calls via known SDKs get lower risk scores
+- **Auth Flow Recognition**: Identifies OAuth2, JWT, session management patterns — token refresh isn't data exfiltration
+- **Data Flow Tracking**: Traces variables from source (env read, file read) to sink (HTTP, exec) — only flags actual exfiltration paths
+- **Confidence Scoring**: Each finding has `high/medium/low` confidence — single regex matches don't tank your score
+
+```
+📋 Score Breakdown:
+  Base: 100
+  env-leak (low, conf: low → ×0.3)     ← SDK detected, penalty reduced 70%
+  obfuscation (medium, conf: medium → ×0.6)
+  ⚠ Cap applied: medium findings present → max 85
+  Final: 85/100
+```
+
+---
+
 ## ⚡ Quick Start
 
 ```bash
-# Scan a skill / MCP server / plugin (31 rules, offline, <1s)
+# Scan a skill / MCP server / plugin (28 rules, offline, <1s)
 npx @elliotllliu/agent-shield scan ./my-skill/
 
 # Scan Dify plugins (.difypkg auto-extraction)

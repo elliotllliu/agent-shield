@@ -1,0 +1,37 @@
+# AgentShield self-scan ignore patterns
+# These files are part of the scanner itself and contain
+# security patterns for detection purposes (not actual threats)
+
+# Rule definition files contain regex patterns that match malicious code
+src/rules/attack-chain.ts
+src/rules/backdoor.ts
+src/rules/reverse-shell.ts
+src/rules/crypto-mining.ts
+src/rules/data-exfil.ts
+
+# Python AST analyzer contains detection patterns
+src/analyzers/python_ast.py
+
+# Runtime detectors contain detection patterns
+src/runtime/
+
+# Test fixtures are intentionally malicious
+tests/
+
+# CLI uses execSync for legitimate git/npm operations
+src/cli.ts
+
+# Integration examples demonstrate scanner usage
+examples/
+
+# GitHub App uses execSync for CI integration
+github-app/
+
+# VS Code extension uses execSync for scanner invocation
+vscode-extension/
+
+# Web scanner UI uses execSync for legitimate operations
+web/
+
+# Benchmark samples contain intentionally malicious/benign test cases
+benchmark/
