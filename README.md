@@ -1,513 +1,246 @@
-<h1 align="center">🛡️ AgentShield</h1>
+# 🛡️ AgentShield
 
-<p align="center">
-  <strong>AI Agent Risk Scanner — Detect security risks before they reach your agents</strong><br>
-  <strong>AI Agent 风险扫描器 — 基于 OWASP/MITRE 标准检测安全风险</strong>
-</p>
+**AI Agent 安全扫描器 — 多引擎聚合，一键检测 Skill / Plugin / MCP Server 的安全风险。**
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/@elliotllliu/agent-shield"><img src="https://img.shields.io/npm/v/@elliotllliu/agent-shield" alt="npm"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT"></a>
-  <img src="https://img.shields.io/badge/tests-297%20passing-brightgreen" alt="Tests">
-  <img src="https://img.shields.io/badge/rules-29-blue" alt="Rules">
-  <img src="https://img.shields.io/badge/OWASP%20LLM-mapped-orange" alt="Standards">
-</p>
-
-<p align="center">
-  <a href="README.zh-CN.md">🇨🇳 中文文档</a> · <a href="docs/methodology.md">📚 Methodology</a> · <a href="docs/rules.md">📖 Rule Docs</a> · <a href="docs/integration-guide.md">🔌 Integration</a>
-</p>
+[English](#english) | 中文
 
 ---
 
-Scan skills, MCP servers, and plugins for data exfiltration, backdoors, prompt injection, tool poisoning, and supply chain risks. Every finding is mapped to **OWASP Top 10 for LLM**, **MITRE ATLAS**, and **CWE** — so you're reviewing established standards, not our opinions.
+## 这是什么？
 
-> **Offline-first. AST-powered. Open source. Your data never leaves your machine.**
+你从 GitHub 下了一个 MCP Server，准备装到 Claude Desktop 里用。但你不知道这个代码安不安全 — 会不会偷你的 API 密钥？会不会劫持你的 AI？会不会挖矿？
+
+**AgentShield 帮你扫一眼。** 4 个独立扫描引擎交叉验证，给你一份清晰的中文安全报告。
 
 ```bash
-npx @elliotllliu/agent-shield scan ./my-skill/
+npx @elliotllliu/agent-shield scan ./mcp-server --engines all
 ```
 
----
-
-## 💡 Example Output
-
-```
-🛡️  AgentShield Risk Report
-────────────────────────────────────────────────────
-📁 Target:  ./my-plugin
-📄 Files:   8 files, 262 lines
-⏱  Time:    245ms
-────────────────────────────────────────────────────
-
-📊 Risk Summary
-
-  🔴 LLM09: Supply Chain Vulnerabilities (3 high, 2 medium)
-     https://genai.owasp.org/llmrisk/llm09-supply-chain-vulnerabilities/
-  🟡 LLM06: Sensitive Information Disclosure (1 medium)
-     https://genai.owasp.org/llmrisk/llm06-sensitive-information-disclosure/
-  🟢 LLM01: Prompt Injection (2 low)
-     https://genai.owasp.org/llmrisk/llm01-prompt-injection/
-
-📋 Detailed Findings
-
-  [LLM09: Supply Chain Vulnerabilities]
-  Skill/plugin behavioral hijacking — patterns that modify agent config,
-  inject prompts, or override other skills.
-  Standards: OWASP LLM09 · CWE-829 · ATLAS AML.T0049
-  Research: Greshake et al. (2023) "Not what you've signed up for"
-
-    ├─ plugin.ts:15 — Plugin injects content via before_prompt_build
-    ├─ install.sh:8 — Config tampering: Modifies agent configuration
-    └─ SKILL.md:5  — Behavioral override: forced usage directive
-
-  [LLM06: Sensitive Information Disclosure]
-  Patterns where sensitive data is read and sent via network requests.
-  Standards: OWASP LLM06 · CWE-200 · ATLAS AML.T0048.004
-
-    └─ media.js:14 — Reads sensitive data and sends HTTP request
-
-✅ No security risks detected.     ← Clean projects show this
-```
-
-> **We are an X-ray machine, not a doctor.** We show what patterns exist and cite established standards — you decide what they mean for your use case.
-
----
-
-## 🏆 What Makes AgentShield Different
-
-### 1. 📚 Standards-Based Detection
-
-Every finding is mapped to authoritative security frameworks:
-
-| Standard | Coverage | Purpose |
-|----------|----------|---------|
-| [OWASP Top 10 for LLM](https://genai.owasp.org/) | 26/29 rules | Industry standard for LLM application security |
-| [CWE](https://cwe.mitre.org/) | 24/29 rules | Common Weakness Enumeration (MITRE) |
-| [MITRE ATLAS](https://atlas.mitre.org/) | 7/29 rules | Adversarial Threat Landscape for AI Systems |
-| Academic papers | 4 rules | Peer-reviewed research on prompt injection & tool poisoning |
-
-We don't invent risk categories. We map code patterns to standards that industry experts have already established.
-
-### 2. 🔒 Runtime MCP Interception
-
-Other tools only scan source code. AgentShield also sits **between** your MCP client and server, intercepting every JSON-RPC message in real-time:
+## ⚡ 快速开始
 
 ```bash
-# Insert AgentShield between client and server
-agent-shield proxy node my-mcp-server.js
-
-# Enforce mode: automatically block high-risk tool calls
-agent-shield proxy --enforce python mcp_server.py
-```
-
-**What it catches at runtime:**
-- 🎭 Tool description injection — hidden instructions in tool descriptions
-- 💉 Result injection — malicious content in tool return values
-- 🔑 Credential leakage — sensitive data in tool call parameters
-- 📡 Beacon behavior — abnormal periodic callbacks (C2 pattern)
-- 🪤 Rug-pull attacks — tools changing behavior after initial trust
-
-### 3. ⛓️ Cross-File Attack Chain Detection
-
-Most scanners check one file at a time. AgentShield traces data flow across your entire codebase:
-
-```
-🔴 Cross-file data flow (OWASP LLM09 · CWE-506):
-   config_reader.py reads ~/.ssh/id_rsa → exfiltrator.py POSTs to external server
-
-🔴 Kill Chain detected (ATLAS AML.T0049):
-   Reconnaissance → Access → Collection → Exfiltration → Persistence
-```
-
-### 4. 🧠 AST Taint Tracking (Not Regex)
-
-Uses Python's `ast` module for precise analysis — dramatically reducing false positives:
-
-```python
-user = input("cmd: ")
-eval(user)          # → 🔴 Tainted input flows to eval (CWE-94)
-eval("{'a': 1}")    # → ✅ NOT flagged (safe string literal)
-exec(config_var)    # → 🟡 Dynamic, not proven tainted
-```
-
-### 5. 🕵️ Skill Hijack Detection
-
-Detects multi-layer supply chain attacks targeting AI agent ecosystems:
-
-```
-[LLM09: Supply Chain Vulnerabilities]
-Standards: OWASP LLM09 · CWE-829 · ATLAS AML.T0049
-
-  🔴 Plugin prompt injection: before_prompt_build + prependContext
-  🔴 Config tampering: Modifies agent configuration via CLI
-  🔴 Silent OTA: Downloads update then re-executes itself
-  🟡 Non-standard install source: non-registry domain
-  🟡 Behavioral override: forced usage directive in SKILL.md
-```
-
-Real-world case study: detected a 3-layer supply chain attack where a published skill silently installed a CLI tool from a private CDN, which then injected prompts, modified agent config, and auto-updated without user consent.
-
----
-
-## ⚡ Quick Start
-
-```bash
-# Scan a skill / MCP server / plugin (29 rules, offline, <1s)
+# 基础扫描（内置引擎，秒出结果）
 npx @elliotllliu/agent-shield scan ./my-skill/
 
-# Multi-engine scan — run multiple scanners, cross-validate results
+# 多引擎扫描（首次会自动安装其他引擎）
 npx @elliotllliu/agent-shield scan ./my-skill/ --engines all
-
-# Scan with optional reference score
-npx @elliotllliu/agent-shield scan ./my-skill/ --score
-
-# Scan Dify plugins (.difypkg auto-extraction)
-npx @elliotllliu/agent-shield scan ./plugin.difypkg
-
-# Runtime interception (MCP proxy)
-npx @elliotllliu/agent-shield proxy node my-mcp-server.js
-
-# AI-powered deep analysis (uses YOUR API key)
-npx @elliotllliu/agent-shield scan ./skill/ --ai --provider openai --model gpt-4o
-
-# Discover installed agents on your machine
-npx @elliotllliu/agent-shield discover
-
-# JSON output for programmatic use
-npx @elliotllliu/agent-shield scan ./skill/ --json
-
-# SARIF output for GitHub Code Scanning
-npx @elliotllliu/agent-shield scan ./skill/ --sarif -o results.sarif
-
-# HTML report
-npx @elliotllliu/agent-shield scan ./skill/ --html
 ```
 
----
+## 📋 输出示例
 
-## 🔗 Multi-Engine Aggregation
-
-Run multiple security scanners simultaneously and get a unified report with **cross-engine validation** — findings confirmed by multiple engines have higher confidence.
-
-```bash
-# Run all available engines
-agent-shield scan ./my-skill/ --engines all
-
-# Choose specific engines
-agent-shield scan ./my-skill/ --engines agentshield,aguara
-
-# List available engines
-agent-shield scan ./my-skill/ --engines list
-```
-
-### Integrated Engines
-
-| Engine | Focus | Auto-Install |
-|--------|-------|-------------|
-| **AgentShield** (built-in) | AI Agent risks: skill hijack, prompt injection, MCP runtime | Always available |
-| **[Aguara](https://github.com/garagon/aguara)** | 177 rules: prompt injection, data exfil, NLP + taint tracking | ✅ Auto |
-| **[Semgrep](https://github.com/semgrep/semgrep)** | General SAST: injection, XSS, SSRF, hardcoded secrets (2000+ rules) | ✅ Auto |
-| **[Invariant mcp-scan](https://github.com/invariantlabs-ai/mcp-scan)** | MCP-specific: tool poisoning, cross-origin escalation, rug pull | ✅ Auto |
-
-### Cross-Engine Validation
-
-The most valuable part of multi-engine scanning — when multiple independent scanners agree on a finding, it's much more likely to be a real issue. When they disagree, the consensus logic makes smart judgments:
-
-| Scenario | Conclusion |
-|----------|-----------|
-| 2+ engines flag high risk | 🔴 Genuinely concerning |
-| 1 engine flags high, others clean | ⚠️ Likely false positive, verify manually |
-| 2+ engines flag medium | ⚠️ Worth checking |
-| 1 engine flags medium, others clean | ✅ Probably safe |
-| Only low-risk findings | ✅ Safe, routine behavior |
-| All engines clean | ✅ Fully safe |
+### 单引擎扫描
 
 ```
+🛡️  安全扫描报告
+═══════════════════════════════════════════════════════
+
+📁 扫描目标:  ./my-skill
+📄 扫描范围:  8 个文件，262 行代码
+⏱  扫描耗时:  245ms
+
+───────────────────────────────────────────────────────
+📊 风险总览
+───────────────────────────────────────────────────────
+
+  ⚠️  2 个中等风险
+  ℹ️  3 个低风险
+
+───────────────────────────────────────────────────────
+📋 发现的风险
+───────────────────────────────────────────────────────
+
+⚠️ 环境变量泄露（2 处）
+  代码读取了环境变量（如 API 密钥）并发送了网络请求
+  参考标准: OWASP LLM06 · CWE-538
+
+  📍 src/client.ts:54
+  📍 src/config.ts:12
+
+ℹ️ 网络请求风险（3 处）
+  代码动态构造 URL 发起请求，可能被利用访问内部服务
+  参考标准: OWASP LLM07 · CWE-918
+
+  📍 src/api.ts:23
+  📍 src/api.ts:45
+  📍 src/api.ts:67
+
+═══════════════════════════════════════════════════════
+```
+
+### 多引擎扫描（会诊模式）
+
+```
+🛡️  安全检测报告
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📁 检测对象:  ./mcp-playwright
+🔧 检测引擎:  4 个独立扫描器
+⏱  总耗时:    91.7s
+
+──────────────────────────────────────────────────────
+🔍 各方检测结论
+──────────────────────────────────────────────────────
+
+🛡️ AgentShield — AI Agent 安全
+   结论: ⚠️ 发现 2 处需关注
+   • 代码混淆
+     📍 src/index.ts:1
+   • 另有 9 处低风险提示
+
+🔍 Aguara — 通用代码安全
+   结论: ✅ 未发现风险
+
+🔎 Semgrep — 代码质量与注入检测
+   结论: ✅ 未发现风险
+
+🧪 Invariant mcp-scan — MCP Tool Poisoning 检测
+   结论: ✅ 未发现风险
+
+──────────────────────────────────────────────────────
 📊 综合结论
+──────────────────────────────────────────────────────
 
-⚠️ 单个引擎标记高风险，其余未发现问题
-   3/5 个引擎未检出风险，高风险标记可能为误报
-   建议人工确认标记项是否为正常功能
+✅ 整体安全，有少量提示
+   3/4 个引擎未检出风险
+   少量低风险提示属于常规功能行为
 
-  ✅ 后门/远程控制  — 5 个引擎均未检出
-  ✅ 数据窃取外渗   — 5 个引擎均未检出
-  ✅ Prompt 指令注入 — 5 个引擎均未检出
+  ✅ 后门/远程控制  — 4 个引擎均未检出
+  ✅ 数据窃取外渗   — 4 个引擎均未检出
+  ✅ Prompt 指令注入 — 4 个引擎均未检出
+  ✅ 挖矿行为       — 4 个引擎均未检出
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-> We aggregate, not compete. Each engine has unique strengths — together they provide more complete coverage and higher confidence.
+### 干净项目
 
----
+```
+🛡️  安全扫描报告
+═══════════════════════════════════════════════════════
 
-## 🔍 29 Security Rules (Mapped to Standards)
+📁 扫描目标:  ./weather-skill
+📄 扫描范围:  1 个文件，113 行代码
+⏱  扫描耗时:  236ms
 
-### Risk Category: Code Execution (OWASP LLM09 · CWE-94)
+✅ 扫描完成，未发现安全风险。
 
-| Rule | Detects | CWE |
-|------|---------|-----|
-| `backdoor` | `eval()`, `exec()`, `new Function()` with dynamic input | CWE-94 |
-| `reverse-shell` | Outbound socket connections piped to shell | CWE-506 |
-| `crypto-mining` | Mining pool connections, xmrig, coinhive | CWE-400 |
-| `obfuscation` | `eval(atob(...))`, hex chains, packed code | CWE-506 |
-| `python-security` | 35 patterns: eval, pickle, subprocess, SQL injection | CWE-94 |
-| `go-rust-security` | 22 patterns: command injection, unsafe blocks | CWE-676 |
+═══════════════════════════════════════════════════════
+```
 
-### Risk Category: Data Safety (OWASP LLM06 · CWE-200)
+## 🔧 多引擎聚合
 
-| Rule | Detects | CWE |
-|------|---------|-----|
-| `data-exfil` | Reads sensitive data + sends HTTP requests | CWE-200 |
-| `env-leak` | Environment variables + outbound HTTP | CWE-526 |
-| `sensitive-read` | Access to `~/.ssh`, `~/.aws`, `~/.kube` | CWE-538 |
-| `credential-hardcode` | Hardcoded AWS keys, GitHub PATs, Stripe tokens | CWE-798 |
-| `phone-home` | Periodic beacons to external endpoints | CWE-200 |
+4 个独立扫描引擎，首次运行自动安装，用户无需操心：
 
-### Risk Category: Tool Integrity (OWASP LLM07)
-
-| Rule | Detects | Standard |
-|------|---------|----------|
-| `tool-shadowing` | Cross-server tool name conflicts | ATLAS AML.T0052 |
-| `description-integrity` | Hidden instructions in tool descriptions | OWASP LLM07 |
-| `mcp-manifest` | Wildcard perms, undeclared capabilities | OWASP LLM07 |
-| `mcp-runtime` | Missing authorization, debug exposure | CWE-862 |
-| `network-ssrf` | User-controlled URLs, SSRF patterns | CWE-918 |
-
-### Risk Category: Prompt Injection (OWASP LLM01 · ATLAS AML.T0051)
-
-| Rule | Detects | Standard |
-|------|---------|----------|
-| `prompt-injection` | 55+ patterns: override, identity manipulation, TPA | CWE-77 |
-| `multilang-injection` | 8-language injection: 中/日/韓/俄/阿/西/法/德 | CWE-77 |
-| `prompt-injection-llm` | LLM-evaluated semantic injection | CWE-77 |
-
-### Risk Category: Supply Chain (OWASP LLM09 · ATLAS AML.T0049)
-
-| Rule | Detects | CWE |
-|------|---------|-----|
-| `skill-hijack` | Plugin prompt injection, config tampering, silent OTA | CWE-829 |
-| `attack-chain` | Multi-stage kill chains (recon → exfil) | CWE-506 |
-| `cross-file` | Coordinated attacks spanning multiple files | CWE-506 |
-| `supply-chain` | Known CVEs in dependencies | CWE-829 |
-| `typosquatting` | Package name squatting: `1odash` → `lodash` | CWE-829 |
-| `hidden-files` | `.env` with secrets, unexpected files | CWE-538 |
-
-### Risk Category: Permissions & Quality
-
-| Rule | Detects | Standard |
-|------|---------|----------|
-| `privilege` | SKILL.md permissions vs actual behavior mismatch | CWE-250 |
-| `skill-risks` | Financial ops, external dependencies | OWASP LLM07 |
-| `toxic-flow` | Cross-tool data leak patterns | CWE-502 |
-
----
-
-## 📊 Key Features
-
-| Feature | Details |
-|---------|---------|
-| **Standards-Based** | Every finding mapped to OWASP Top 10 LLM + CWE + MITRE ATLAS |
-| **Runtime MCP Proxy** | Sit between client and server, intercept JSON-RPC in real-time |
-| **Cross-File Analysis** | Trace data flow and attack chains across multiple files |
-| **AST Taint Tracking** | Python AST analysis — not just regex, real data flow |
-| **Skill Hijack Detection** | 6 sub-categories: prompt injection, config tampering, silent OTA, etc. |
-| **29 Detection Rules** | Code execution, data safety, supply chain, prompt injection, tool integrity |
-| **8-Language Injection** | Chinese, Japanese, Korean, Russian, Arabic, Spanish, French, German |
-| **100% Offline** | Your code never leaves your machine |
-| **Zero Install** | `npx @elliotllliu/agent-shield scan .` — no setup needed |
-| **VS Code Extension** | Real-time diagnostics in your editor |
-| **GitHub App + Action** | Auto-scan PRs with SARIF upload |
-| **Open Source (MIT)** | Free to use, modify, and contribute |
-
-> We focus on **detection and evidence**. We show you what patterns exist, cite the relevant standards, and let you decide what action to take.
-
----
-
-## 📋 Real-World Validation: 493 Dify Plugins
-
-We scanned the entire [langgenius/dify-plugins](https://github.com/langgenius/dify-plugins) repository:
-
-| Metric | Value |
-|--------|-------|
-| Plugins scanned | 493 |
-| Files analyzed | 9,862 |
-| Lines of code | 939,367 |
-| Scan time | ~120s |
-
-**6 plugins** flagged with `eval()`/`exec()` executing dynamic code (CWE-94).
-
-[Full report →](reports/dify-plugins-report.md)
-
----
-
-## 🔌 Integrate AgentShield Into Your Platform
-
-> **Running a skill marketplace, MCP directory, or plugin registry?**
-
-Your platform lists hundreds of skills and plugins. Users install them into AI agents with access to files, credentials, and shell commands. AgentShield gives you:
-
-- **Risk reports** on every submission — based on industry standards, not arbitrary scores
-- **CI/CD gates** — fail PRs that introduce high-risk patterns
-- **SARIF integration** — feed results into GitHub Code Scanning
-
-### How to Integrate
+| 引擎 | 专注领域 | 安装 |
+|------|---------|------|
+| **AgentShield**（内置） | AI Agent 安全：Skill 劫持、Prompt 注入、MCP 运行时 | 无需安装 |
+| **[Aguara](https://github.com/garagon/aguara)** | 通用代码安全（177 规则）：数据外渗、污点追踪 | ✅ 自动 |
+| **[Semgrep](https://github.com/semgrep/semgrep)** | 代码质量（2000+ 规则）：注入、XSS、SSRF | ✅ 自动 |
+| **[Invariant](https://github.com/invariantlabs-ai/mcp-scan)** | MCP 专项：Tool Poisoning、跨域提权 | ✅ 自动 |
 
 ```bash
-npx @elliotllliu/agent-shield scan ./skill --json
+# 首次运行自动安装所有引擎
+$ agent-shield scan ./dir --engines all
+
+🔧 检查引擎...
+  ✅ AgentShield — 已就绪
+  📦 Aguara — 正在安装... 完成
+  📦 Semgrep — 正在安装... 完成
+  📦 Invariant — 正在安装... 完成
 ```
 
-```json
-{
-  "totalFindings": 3,
-  "summary": { "high": 1, "medium": 1, "low": 1 },
-  "findings": [
-    {
-      "severity": "high",
-      "rule": "skill-hijack",
-      "file": "plugin.ts",
-      "line": 15,
-      "message": "Plugin injects content via before_prompt_build",
-      "references": {
-        "owasp": "LLM09: Supply Chain Vulnerabilities",
-        "cwe": "CWE-829"
-      }
-    }
-  ]
-}
-```
+### 共识判断
 
-📖 **[Full Integration Guide →](docs/integration-guide.md)**
+综合结论不取最差结果，而是看多引擎共识：
 
----
+| 情况 | 综合结论 |
+|------|---------|
+| 2+ 引擎标高风险 | 🔴 确实需要关注 |
+| 1 引擎标高风险，其余干净 | ⚠️ 可能误报，建议确认 |
+| 2+ 引擎标中等风险 | ⚠️ 建议检查 |
+| 1 引擎标中等，其余干净 | ✅ 整体安全 |
+| 全部干净 | ✅ 所有引擎均未检出 |
 
-## 📦 Ecosystem
+## 🎯 检测什么？
 
-### 🤖 GitHub App
-Auto-scan every PR for security risks. [Learn more →](github-app/README.md)
+| 风险类别 | 说明 | 对应标准 |
+|---------|------|---------|
+| 🔴 插件劫持 | 修改 AI 配置、注入指令、覆盖其他插件 | OWASP LLM09 |
+| 🔴 后门执行 | eval/exec 动态执行，可能运行恶意代码 | CWE-94 |
+| 🔴 远程控制 | 出站连接 + shell，可能被远程操控 | CWE-506 |
+| ⚠️ 数据外泄 | 读取敏感数据后通过网络发送 | OWASP LLM06 |
+| ⚠️ Prompt 注入 | 覆盖 AI 指令，改变 AI 行为 | OWASP LLM01 |
+| ⚠️ Tool Poisoning | 工具描述中隐藏恶意指令 | ATLAS AML.T0049 |
+| ⚠️ 代码混淆 | 经过混淆处理，难以审查意图 | CWE-506 |
+| ℹ️ 网络请求 | 动态 URL 构造，可能被利用 | CWE-918 |
+| ℹ️ 权限风险 | 实际行为超出声明的权限 | CWE-250 |
 
-### 💻 VS Code Extension
-Real-time security diagnostics in your editor. [Learn more →](vscode-extension/README.md)
-
-### 🔒 Runtime MCP Proxy
-Monitor MCP server behavior in real-time.
+## 📄 输出格式
 
 ```bash
-agent-shield proxy --enforce node my-mcp-server.js
+# 终端报告（默认中文）
+agent-shield scan ./dir
+
+# 终端报告（英文）
+agent-shield scan ./dir --lang en
+
+# HTML 报告（可分享）
+agent-shield scan ./dir --html -o report.html
+
+# JSON 输出（CI/CD 集成）
+agent-shield scan ./dir --json
+
+# 多引擎
+agent-shield scan ./dir --engines all
+agent-shield scan ./dir --engines all --html -o report.html
+
+# 附带参考分数（可选）
+agent-shield scan ./dir --score
+
+# SARIF 输出（GitHub Code Scanning）
+agent-shield scan ./dir --sarif -o results.sarif
 ```
 
----
+## 🔬 我们的立场
 
-## ⚙️ CI Integration
+> **"我们是 X 光机，不是医生。我们照出里面有什么，引用权威标准 — 你来决定它意味着什么。"**
 
-### GitHub Action
+- 每条发现都映射到 OWASP / CWE / MITRE ATLAS 标准
+- 不替用户做决定，提供事实和建议
+- 多引擎交叉验证减少误报
+
+## 📦 安装
+
+```bash
+# 使用 npx（推荐，无需安装）
+npx @elliotllliu/agent-shield scan ./my-skill/
+
+# 全局安装
+npm install -g @elliotllliu/agent-shield
+agent-shield scan ./my-skill/
+```
+
+## 📊 CI/CD 集成
 
 ```yaml
-name: Security Scan
-on: [push, pull_request]
-jobs:
-  scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: elliotllliu/agent-shield@main
-        with:
-          path: './skills/'
+# GitHub Actions
+- name: Security Scan
+  run: npx @elliotllliu/agent-shield scan ./src --json > results.json
 ```
-
-### GitHub Action with SARIF Upload
-
-```yaml
-name: Security Scan (SARIF)
-on: [push, pull_request]
-jobs:
-  scan:
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: elliotllliu/agent-shield@main
-        with:
-          path: './skills/'
-          sarif: 'true'
-      - name: Upload SARIF
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: agent-shield-results.sarif
-```
-
-### npx one-liner
-
-```yaml
-- name: Security scan
-  run: npx -y @elliotllliu/agent-shield scan .
-```
-
----
-
-## ⚙️ Configuration
-
-Create `.agent-shield.yml` (or run `agent-shield init`):
-
-```yaml
-rules:
-  disable:
-    - supply-chain
-    - phone-home
-ignore:
-  - "tests/**"
-  - "*.test.ts"
-```
-
----
-
-## 🗂️ Supported Platforms
-
-| Platform | Support |
-|----------|---------|
-| AI Agent Skills | OpenClaw, Codex, Claude Code |
-| MCP Servers | Model Context Protocol tool servers |
-| Dify Plugins | `.difypkg` archive extraction + scan |
-| npm Packages | Any package with executable code |
-| Python Projects | AST analysis + 35 security patterns |
-| General | Any directory with JS/TS/Python/Go/Rust/Shell code |
-
----
-
-## 📚 Methodology & References
-
-AgentShield's detection rules are grounded in established security research:
-
-- **OWASP Top 10 for LLM Applications (2025)** — [genai.owasp.org](https://genai.owasp.org/)
-- **MITRE ATLAS** — [atlas.mitre.org](https://atlas.mitre.org/)
-- **CWE (Common Weakness Enumeration)** — [cwe.mitre.org](https://cwe.mitre.org/)
-- **NIST AI 100-2** — Adversarial Machine Learning taxonomy
-- Greshake et al. (2023) — *"Not what you've signed up for"* — [arXiv:2302.12173](https://arxiv.org/abs/2302.12173)
-- Liu et al. (2024) — *"Automatic and Universal Prompt Injection"* — [arXiv:2403.04957](https://arxiv.org/abs/2403.04957)
-- Invariant Labs (2024) — *"Tool Poisoning Attacks on MCP Servers"* — [invariantlabs.ai](https://invariantlabs.ai/research/mcp-security)
-
-For a detailed mapping of each rule to its standards, see [docs/rules.md](docs/rules.md).
-
----
-
-## 🤝 Contributing
-
-We especially welcome:
-- New detection rules (with CWE/OWASP mapping)
-- False positive / false negative reports
-- Third-party benchmark test results
-
-See [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## 🌐 Community & Partners
-
-| Partner | Contribution |
-|---------|-------------|
-| [Agent Skills Hub](https://agentskillshub.top) | Real-world testing across skill registries, security insights, and feature feedback |
-
-## Links
-
-📦 [npm](https://www.npmjs.com/package/@elliotllliu/agent-shield) · 📖 [Rule Docs](docs/rules.md) · 🤖 [GitHub App](github-app/README.md) · 💻 [VS Code](vscode-extension/README.md) · 🔌 [Integration Guide](docs/integration-guide.md) · 🇨🇳 [中文 README](README.zh-CN.md)
 
 ## License
 
 MIT
+
+---
+
+<a id="english"></a>
+## English
+
+AgentShield is a multi-engine security scanner for AI Agent skills, plugins, and MCP servers. It aggregates 4 independent scanning engines and provides consensus-based risk assessment.
+
+```bash
+npx @elliotllliu/agent-shield scan ./my-skill/ --engines all --lang en
+```
+
+See Chinese documentation above for full details. Use `--lang en` for English output.
