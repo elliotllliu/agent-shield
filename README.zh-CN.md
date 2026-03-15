@@ -152,7 +152,8 @@ agent-shield scan ./my-skill/ --engines list
 | **AgentShield**（内置） | AI Agent 专项：Skill 劫持、Prompt 注入、MCP 运行时 | 无需安装 |
 | **[Aguara](https://github.com/garagon/aguara)** | 177 规则：Prompt 注入、数据外渗、NLP + 污点追踪 | 一键安装 |
 | **[Skill Vetter](https://github.com/app-incubator-xyz/skill-vetter)** | 多扫描器聚合：aguara + Cisco + 凭证检测 + 结构检查 | `git clone` |
-| **[Tencent AI-Infra-Guard](https://github.com/Tencent/AI-Infra-Guard)** | LLM 驱动的深度代码审计 | 需要 API key |
+| **[Semgrep](https://github.com/semgrep/semgrep)** | 通用 SAST：注入、XSS、SSRF、硬编码凭证（2000+ 规则） | `pipx install semgrep` |
+| **[Invariant mcp-scan](https://github.com/invariantlabs-ai/mcp-scan)** | MCP 专项：Tool Poisoning、跨域提权、Rug Pull 检测 | `pipx install mcp-scan` |
 
 ### 交叉验证
 
