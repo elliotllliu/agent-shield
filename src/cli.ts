@@ -66,6 +66,13 @@ program
       const aggResult = await aggregateScan(target, engineIds);
       if (options.json) {
         console.log(JSON.stringify(aggResult, null, 2));
+      } else if (options.html) {
+        const { generateMultiEngineHtmlReport } = await import("./reporter/html.js");
+        const htmlContent = generateMultiEngineHtmlReport(aggResult, { lang: (options as any).lang || "zh" });
+        const outPath = (options as any).output || "agentshield-multi-engine-report.html";
+        const { writeFileSync } = await import("fs");
+        writeFileSync(outPath, htmlContent);
+        console.log(`📄 Multi-engine HTML report saved to: ${outPath}`);
       } else {
         printAggregatedReport(aggResult);
       }
