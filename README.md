@@ -244,22 +244,24 @@ npx @elliotllliu/agent-shield scan ./skill/ --html
 
 ---
 
-## 📊 AgentShield vs Alternatives
+## 📊 Key Features
 
-| | AgentShield | Snyk Agent Scan | Tencent AI-Infra-Guard |
-|---|:---:|:---:|:---:|
-| **Standards mapping** | **✅ OWASP+CWE+ATLAS** | Partial | ❌ |
-| **Runtime MCP Interception** | **✅ MCP Proxy** | ❌ | ❌ |
-| **Cross-file Attack Chain** | **✅** | ❌ | Partial |
-| **AST Taint Tracking** | **✅ Python** | ❌ | Unknown |
-| **Skill Hijack Detection** | **✅ 6 sub-categories** | ❌ | ❌ |
-| Static Rules | 29 | 6 | Many (incl. infra) |
-| Multi-language Injection | ✅ 8 languages | ❌ English only | Unknown |
-| 100% Offline | ✅ | ❌ cloud required | ✅ |
-| Zero Install (`npx`) | ✅ | ❌ Python + uv | ❌ Docker |
-| VS Code Extension | ✅ | ❌ | ❌ |
-| GitHub App + Action | ✅ | ❌ | ❌ |
-| Open Source | ✅ MIT | ❌ | ✅ |
+| Feature | Details |
+|---------|---------|
+| **Standards-Based** | Every finding mapped to OWASP Top 10 LLM + CWE + MITRE ATLAS |
+| **Runtime MCP Proxy** | Sit between client and server, intercept JSON-RPC in real-time |
+| **Cross-File Analysis** | Trace data flow and attack chains across multiple files |
+| **AST Taint Tracking** | Python AST analysis — not just regex, real data flow |
+| **Skill Hijack Detection** | 6 sub-categories: prompt injection, config tampering, silent OTA, etc. |
+| **29 Detection Rules** | Code execution, data safety, supply chain, prompt injection, tool integrity |
+| **8-Language Injection** | Chinese, Japanese, Korean, Russian, Arabic, Spanish, French, German |
+| **100% Offline** | Your code never leaves your machine |
+| **Zero Install** | `npx @elliotllliu/agent-shield scan .` — no setup needed |
+| **VS Code Extension** | Real-time diagnostics in your editor |
+| **GitHub App + Action** | Auto-scan PRs with SARIF upload |
+| **Open Source (MIT)** | Free to use, modify, and contribute |
+
+> We focus on **detection and evidence**. We show you what patterns exist, cite the relevant standards, and let you decide what action to take.
 
 ---
 
