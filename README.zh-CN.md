@@ -150,10 +150,9 @@ agent-shield scan ./my-skill/ --engines list
 | 引擎 | 专注领域 | 安装方式 |
 |------|---------|---------|
 | **AgentShield**（内置） | AI Agent 专项：Skill 劫持、Prompt 注入、MCP 运行时 | 无需安装 |
-| **[Aguara](https://github.com/garagon/aguara)** | 177 规则：Prompt 注入、数据外渗、NLP + 污点追踪 | 一键安装 |
-| **[Skill Vetter](https://github.com/app-incubator-xyz/skill-vetter)** | 多扫描器聚合：aguara + Cisco + 凭证检测 + 结构检查 | `git clone` |
-| **[Semgrep](https://github.com/semgrep/semgrep)** | 通用 SAST：注入、XSS、SSRF、硬编码凭证（2000+ 规则） | `pipx install semgrep` |
-| **[Invariant mcp-scan](https://github.com/invariantlabs-ai/mcp-scan)** | MCP 专项：Tool Poisoning、跨域提权、Rug Pull 检测 | `pipx install mcp-scan` |
+| **[Aguara](https://github.com/garagon/aguara)** | 177 规则：Prompt 注入、数据外渗、NLP + 污点追踪 | ✅ 自动安装 |
+| **[Semgrep](https://github.com/semgrep/semgrep)** | 通用 SAST：注入、XSS、SSRF、硬编码凭证（2000+ 规则） | ✅ 自动安装 |
+| **[Invariant mcp-scan](https://github.com/invariantlabs-ai/mcp-scan)** | MCP 专项：Tool Poisoning、跨域提权、Rug Pull 检测 | ✅ 自动安装 |
 
 ### 共识判断
 

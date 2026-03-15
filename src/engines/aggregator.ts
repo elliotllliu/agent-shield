@@ -5,8 +5,6 @@ import type {
 } from "./types.js";
 import { AgentShieldAdapter } from "./agentshield.js";
 import { AguaraAdapter } from "./aguara.js";
-import { TencentGuardAdapter } from "./tencent.js";
-import { SkillVetterAdapter } from "./skill-vetter.js";
 import { SemgrepAdapter } from "./semgrep.js";
 import { InvariantAdapter } from "./invariant.js";
 
@@ -16,7 +14,6 @@ import { InvariantAdapter } from "./invariant.js";
 const ALL_ENGINES: EngineAdapter[] = [
   new AgentShieldAdapter(),
   new AguaraAdapter(),
-  new SkillVetterAdapter(),
   new SemgrepAdapter(),
   new InvariantAdapter(),
 ];
@@ -35,6 +32,8 @@ export function listEngines(): EngineAdapter[] {
   return ALL_ENGINES;
 }
 
+import { ensureEngines, getEnginePath } from "./auto-install.js";
+
 /**
  * Run multiple engines and aggregate results.
  */
@@ -46,6 +45,12 @@ export async function aggregateScan(
   const engines = engineIds
     ? ALL_ENGINES.filter(e => engineIds.includes(e.id))
     : ALL_ENGINES;
+
+  // Auto-install missing engines
+  await ensureEngines(engines);
+
+  // Update PATH so newly installed engines are found
+  process.env.PATH = getEnginePath();
 
   // Check availability first
   console.log(chalk.bold("\n🔍 Multi-Engine Scan\n"));

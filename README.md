@@ -202,13 +202,12 @@ agent-shield scan ./my-skill/ --engines list
 
 ### Integrated Engines
 
-| Engine | Focus | Install |
-|--------|-------|---------|
+| Engine | Focus | Auto-Install |
+|--------|-------|-------------|
 | **AgentShield** (built-in) | AI Agent risks: skill hijack, prompt injection, MCP runtime | Always available |
-| **[Aguara](https://github.com/garagon/aguara)** | 177 rules: prompt injection, data exfil, NLP + taint tracking | `curl -fsSL ... \| bash` |
-| **[Skill Vetter](https://github.com/app-incubator-xyz/skill-vetter)** | Multi-scanner gate: aguara + Cisco + secrets + structure | `git clone` |
-| **[Semgrep](https://github.com/semgrep/semgrep)** | General SAST: injection, XSS, SSRF, hardcoded secrets (2000+ rules) | `pipx install semgrep` |
-| **[Invariant mcp-scan](https://github.com/invariantlabs-ai/mcp-scan)** | MCP-specific: tool poisoning, cross-origin escalation, rug pull | `pipx install mcp-scan` |
+| **[Aguara](https://github.com/garagon/aguara)** | 177 rules: prompt injection, data exfil, NLP + taint tracking | ✅ Auto |
+| **[Semgrep](https://github.com/semgrep/semgrep)** | General SAST: injection, XSS, SSRF, hardcoded secrets (2000+ rules) | ✅ Auto |
+| **[Invariant mcp-scan](https://github.com/invariantlabs-ai/mcp-scan)** | MCP-specific: tool poisoning, cross-origin escalation, rug pull | ✅ Auto |
 
 ### Cross-Engine Validation
 
