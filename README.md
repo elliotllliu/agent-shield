@@ -10,6 +10,7 @@
 [![Rules](https://img.shields.io/badge/rules-29-blue)]()
 [![Standards](https://img.shields.io/badge/OWASP%20LLM-mapped-orange)]()
 
+[🇨🇳 中文文档](README.zh-CN.md)
 Scan skills, MCP servers, and plugins for data exfiltration, backdoors, prompt injection, tool poisoning, and supply chain risks. Every finding is mapped to **OWASP Top 10 for LLM**, **MITRE ATLAS**, and **CWE** — so you're reviewing established standards, not our opinions.
 
 **Offline-first. AST-powered. Open source. Your data never leaves your machine.**
