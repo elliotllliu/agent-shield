@@ -139,7 +139,7 @@ export async function installGitleaks(): Promise<boolean> {
     const cpu = arch() === "arm64" ? "arm64" : "x64";
     console.log("  📦 Gitleaks — 正在安装...");
     // Get latest release
-    const tag = execSync("curl -sI https://github.com/gitleaks/gitleaks/releases/latest | grep -i location | sed 's/.*tag\\///' | tr -d '\\r\\n'", {
+    const tag = execSync('curl -sI https://github.com/gitleaks/gitleaks/releases/latest | grep -i location | sed "s/.*tag\\///" | tr -d "\\r\\n"', {
       timeout: 15000, stdio: ["pipe", "pipe", "pipe"], shell: "/bin/bash"
     }).toString().trim();
     if (tag) {
