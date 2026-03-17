@@ -171,10 +171,15 @@ export async function installBearer(): Promise<boolean> {
   try {
     const binDir = getEngineBinDir();
     console.log("  📦 Bearer — 正在安装...");
-    const tag = execSync(
-      "curl -sI https://github.com/Bearer/bearer/releases/latest 2>/dev/null | grep -i location | sed 's/.*tag\\///' | tr -d '\\r\\n'",
-      { timeout: 15000, stdio: ["pipe", "pipe", "pipe"], shell: "/bin/bash" }
-    ).toString().trim();
+    const tagCmd = [
+      "curl -sI https://github.com/Bearer/bearer/releases/latest 2>/dev/null",
+      "grep -i location",
+      "awk -F/ '{print $NF}'",
+      "tr -d '\\r\\n'"
+    ].join(" | ");
+    const tag = execSync(tagCmd, {
+      timeout: 15000, stdio: ["pipe", "pipe", "pipe"], shell: "/bin/bash"
+    }).toString().trim();
     if (tag) {
       const ver = tag.replace("v", "");
       const os = platform() === "darwin" ? "darwin" : "linux";

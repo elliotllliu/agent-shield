@@ -310,6 +310,7 @@ export function printAggregatedReport(result: AggregatedResult): void {
   }
 
   // ─── 综合结论（核心判断逻辑）───
+  // AgentShield 内置引擎不参与共识投票，只作为参考
   console.log(thinDiv);
   console.log(chalk.bold("📊 综合结论"));
   console.log(thinDiv);
@@ -317,13 +318,15 @@ export function printAggregatedReport(result: AggregatedResult): void {
 
   const allFindings = result.allFindings;
   const activeEngines = result.engines.filter(e => e.available && e.findings);
-  const totalActive = activeEngines.length;
+  // Only count external engines for consensus (exclude built-in reference)
+  const votingEngines = activeEngines.filter(e => e.engine !== "agentshield");
+  const totalVoting = votingEngines.length;
 
-  // Count how many engines flagged each severity level
-  const enginesWithHigh = activeEngines.filter(e => e.findings!.some(f => f.severity === "high")).length;
-  const enginesWithMed = activeEngines.filter(e => e.findings!.some(f => f.severity === "medium")).length;
-  const enginesClean = activeEngines.filter(e => e.findings!.length === 0).length;
-  const enginesLowOnly = activeEngines.filter(e =>
+  // Count how many EXTERNAL engines flagged each severity level
+  const enginesWithHigh = votingEngines.filter(e => e.findings!.some(f => f.severity === "high")).length;
+  const enginesWithMed = votingEngines.filter(e => e.findings!.some(f => f.severity === "medium")).length;
+  const enginesClean = votingEngines.filter(e => e.findings!.length === 0).length;
+  const enginesLowOnly = votingEngines.filter(e =>
     e.findings!.length > 0 && e.findings!.every(f => f.severity === "low" || f.severity === "info")
   ).length;
 
@@ -331,11 +334,11 @@ export function printAggregatedReport(result: AggregatedResult): void {
   if (enginesWithHigh >= 2) {
     // 2+ engines agree on high risk → genuinely concerning
     console.log(chalk.red.bold("🔴 多个引擎发现高风险，建议谨慎使用"));
-    console.log(chalk.dim(`   ${enginesWithHigh}/${totalActive} 个引擎标记了高风险`));
+    console.log(chalk.dim(`   ${enginesWithHigh}/${totalVoting} 个引擎标记了高风险`));
   } else if (enginesWithHigh === 1 && enginesClean >= 2) {
     // Only 1 engine says high, but most others found nothing → likely false positive
     console.log(chalk.yellow.bold("⚠️ 单个引擎标记高风险，其余未发现问题"));
-    console.log(chalk.dim(`   ${enginesClean}/${totalActive} 个引擎未检出风险，高风险标记可能为误报`));
+    console.log(chalk.dim(`   ${enginesClean}/${totalVoting} 个引擎未检出风险，高风险标记可能为误报`));
     console.log(chalk.dim(`   建议人工确认标记项是否为正常功能`));
   } else if (enginesWithHigh === 1) {
     console.log(chalk.yellow.bold("⚠️ 存在争议，建议人工审查"));
@@ -343,20 +346,20 @@ export function printAggregatedReport(result: AggregatedResult): void {
   } else if (enginesWithMed >= 2) {
     // Multiple engines agree on medium → worth checking
     console.log(chalk.yellow.bold("⚠️ 多个引擎发现中等风险，建议检查后使用"));
-    console.log(chalk.dim(`   ${enginesWithMed}/${totalActive} 个引擎标记了中等风险`));
+    console.log(chalk.dim(`   ${enginesWithMed}/${totalVoting} 个引擎标记了中等风险`));
   } else if (enginesWithMed === 1 && enginesClean >= 2) {
     // Only 1 engine says medium, most others clean → probably fine
     console.log(chalk.green.bold("✅ 整体安全，有少量提示"));
-    console.log(chalk.dim(`   ${enginesClean}/${totalActive} 个引擎未检出风险`));
+    console.log(chalk.dim(`   ${enginesClean}/${totalVoting} 个引擎未检出风险`));
     console.log(chalk.dim(`   1 个引擎有中等风险标记，可选择性检查`));
   } else if (enginesWithMed === 1) {
     console.log(chalk.green.bold("ℹ️ 基本安全，有个别提示可关注"));
   } else if (enginesLowOnly > 0 && enginesClean > 0) {
     // Only low-risk findings, some engines clean
     console.log(chalk.green.bold("✅ 整体安全"));
-    console.log(chalk.dim(`   ${enginesClean}/${totalActive} 个引擎未检出风险`));
+    console.log(chalk.dim(`   ${enginesClean}/${totalVoting} 个引擎未检出风险`));
     console.log(chalk.dim(`   少量低风险提示属于常规功能行为`));
-  } else if (enginesClean === totalActive) {
+  } else if (enginesClean === totalVoting) {
     console.log(chalk.green.bold("✅ 所有引擎均未检出风险"));
   } else {
     console.log(chalk.green.bold("ℹ️ 仅有低风险提示，整体较安全"));
