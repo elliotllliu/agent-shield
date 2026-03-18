@@ -213,6 +213,11 @@ export async function ensureEngines(
     gitleaks: installGitleaks,
     bandit: installBandit,
     bearer: installBearer,
+    trufflehog: installTruffleHog,
+    "osv-scanner": installOsvScanner,
+    grype: installGrype,
+    njsscan: installNjsscan,
+    "detect-secrets": installDetectSecrets,
   };
 
   for (const engine of engines) {

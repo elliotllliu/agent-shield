@@ -11,6 +11,11 @@ import { TrivyAdapter } from "./trivy.js";
 import { GitleaksAdapter } from "./gitleaks.js";
 import { BanditAdapter } from "./bandit.js";
 import { BearerAdapter } from "./bearer.js";
+import { TruffleHogAdapter } from "./trufflehog.js";
+import { OsvScannerAdapter } from "./osv-scanner.js";
+import { GrypeAdapter } from "./grype.js";
+import { NjsscanAdapter } from "./njsscan.js";
+import { DetectSecretsAdapter } from "./detect-secrets.js";
 
 /**
  * Registry of all available engine adapters.
@@ -24,6 +29,11 @@ const ALL_ENGINES: EngineAdapter[] = [
   new GitleaksAdapter(),
   new BanditAdapter(),
   new BearerAdapter(),
+  new TruffleHogAdapter(),
+  new OsvScannerAdapter(),
+  new GrypeAdapter(),
+  new NjsscanAdapter(),
+  new DetectSecretsAdapter(),
 ];
 
 /**
