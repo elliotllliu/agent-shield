@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/elliotllliu-agent-shield-badge.png)](https://mseep.ai/app/elliotllliu-agent-shield)
+
 # 🛡️ AgentShield
 
 **Give your AI a health check.**
