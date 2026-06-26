@@ -1,4 +1,5 @@
 import { execSync } from "child_process";
+import fs from "fs";
 import type { EngineAdapter, EngineResult, EngineFinding } from "./types.js";
 
 /**
@@ -14,18 +15,18 @@ export class SkillVetterAdapter implements EngineAdapter {
   private scriptPath: string | null = null;
 
   async isAvailable(): Promise<boolean> {
+    const home = process.env.HOME || process.env.USERPROFILE || "";
     // Check if skill-vetter is cloned locally
     const paths = [
       "/tmp/skill-vetter/scripts/vett.sh",
-      `${process.env.HOME}/.local/share/skill-vetter/scripts/vett.sh`,
-      `${process.env.HOME}/skill-vetter/scripts/vett.sh`,
+      `${home}/.local/share/skill-vetter/scripts/vett.sh`,
+      `${home}/skill-vetter/scripts/vett.sh`,
     ];
     for (const p of paths) {
-      try {
-        execSync(`test -f "${p}"`, { stdio: "pipe" });
+      if (fs.existsSync(p)) {
         this.scriptPath = p;
         return true;
-      } catch { /* continue */ }
+      }
     }
     return false;
   }
@@ -35,6 +36,7 @@ export class SkillVetterAdapter implements EngineAdapter {
   }
 
   async scan(targetDir: string): Promise<EngineResult> {
+    const home = process.env.HOME || process.env.USERPROFILE || "";
     const start = Date.now();
     const available = await this.isAvailable();
     if (!available || !this.scriptPath) {
@@ -50,7 +52,7 @@ export class SkillVetterAdapter implements EngineAdapter {
       try {
         output = execSync(`bash "${this.scriptPath}" "${targetDir}" 2>&1`, {
           timeout: 120000, maxBuffer: 10 * 1024 * 1024,
-          env: { ...process.env, PATH: `${process.env.HOME}/go/bin:${process.env.HOME}/.local/bin:${process.env.PATH}` },
+          env: { ...process.env, PATH: `${home}/go/bin:${home}/.local/bin:${process.env.PATH}` },
         }).toString();
       } catch (err: any) {
         // vett.sh exits 1 when BLOCKED
