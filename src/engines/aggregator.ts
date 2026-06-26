@@ -7,6 +7,7 @@ import { AgentShieldAdapter } from "./agentshield.js";
 import { AguaraAdapter } from "./aguara.js";
 import { SemgrepAdapter } from "./semgrep.js";
 import { InvariantAdapter } from "./invariant.js";
+import { SkillVetterAdapter } from "./skill-vetter.js";
 import { TrivyAdapter } from "./trivy.js";
 import { GitleaksAdapter } from "./gitleaks.js";
 import { BanditAdapter } from "./bandit.js";
@@ -25,6 +26,7 @@ const ALL_ENGINES: EngineAdapter[] = [
   new AguaraAdapter(),
   new SemgrepAdapter(),
   new InvariantAdapter(),
+  new SkillVetterAdapter(),
   new TrivyAdapter(),
   new GitleaksAdapter(),
   new BanditAdapter(),
